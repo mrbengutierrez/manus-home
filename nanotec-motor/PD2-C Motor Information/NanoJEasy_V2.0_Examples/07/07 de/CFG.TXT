@@ -1,0 +1,47 @@
+; Konfigurationsdatei für USB Steuerungen außer PD4-C
+
+;EXPLANATION, PLEASE READ FIRST: 
+;--------------------------------------------------------------------------------------------------------------------------------------
+;Firmware version:open file info.bin with texteditor (Format: FIR-vxxxx-Bxxxxx) 
+;A ";"-Sign marks a line as comment (the line has no effect)
+;Max. size of this file is 4k
+;All commands consist of a register number (for example 2031, refere to the manual for futher explanation) and a value 
+;After changing values USB has to be disconnected and you need to power off and on the controller again for the changes to take effect
+
+
+;max. Phasenstrom, mA
+;2031=600		
+
+;Schrittauflösung, Schritte/Umdrehung/encoder
+608F:01=2000
+608f:02=1
+
+;Zielposition 1, Schritte 
+2400:01=10000
+
+;Zielposition 2
+2400:02=-2000
+
+;Zielgeschwindigkeit 1, U/min
+2400:03=300
+
+;Zielgeschwindigkeit 2, U/min
+2400:04=100
+
+;Pause zwishcen Fahrprofilen , ms
+2400:05=2000
+
+;Pause nach dem zweiten Fahrprofil
+2400:06=2000
+
+;Beschleunigungsrampe,  (U/min)/S 
+6083=10000
+
+:Bremsrampe , (U/min)/S
+6084=10000
+
+;max Beschleunigung, (U/min)/S
+60C5=1000000
+
+;max Bremsrampe, (U/min)/S
+60C6=1000000
