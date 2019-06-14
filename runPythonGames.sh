@@ -1,4 +1,4 @@
 #!/bin/bash
-cd /home/mrbengutierrez/Desktop/RehabGame
-python menu.py
+cd ../rehab-games
+sudo python3 menu.py
 

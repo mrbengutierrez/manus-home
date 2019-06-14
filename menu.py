@@ -3,7 +3,7 @@
 
 import sys, subprocess, csv
 import os
-os.chdir("/home/mrbengutierrez/Desktop/RehabGame")
+os.chdir("../rehab-games/")  # or place this file in rehab-games
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -33,7 +33,7 @@ class Game1(Frame):
     def paint(self, painter, option, widget):
         painter.drawImage( 0, 0, self.image)
     def mousePressEvent(self, event):
-        subprocess.call("python 1-Clock.py", shell=True)
+        subprocess.call("python3 1-Clock.py", shell=True)
 
 
 class Game2(Frame):
@@ -44,7 +44,7 @@ class Game2(Frame):
     def paint(self, painter, option, widget):
         painter.drawImage( 0, 0, self.image)
     def mousePressEvent(self, event):
-        subprocess.call("python 2-Maze.py", shell=True)
+        subprocess.call("python3 2-Maze.py", shell=True)
 
 
 class Game3(Frame):
@@ -55,7 +55,7 @@ class Game3(Frame):
     def paint(self, painter, option, widget):
         painter.drawImage( 0, 0, self.image)
     def mousePressEvent(self, event):
-        subprocess.call("python 3-Pick.py", shell=True)
+        subprocess.call("python3 3-Pick.py", shell=True)
 
 
 class Game4(Frame):
@@ -66,7 +66,7 @@ class Game4(Frame):
     def paint(self, painter, option, widget):
         painter.drawImage( 0, 0, self.image)
     def mousePressEvent(self, event):
-        subprocess.call("python 4-Pong.py", shell=True)
+        subprocess.call("python3 4-Pong.py", shell=True)
 
 class Game5(Frame):
     def setup(self):
@@ -76,7 +76,7 @@ class Game5(Frame):
     def paint(self, painter, option, widget):
         painter.drawImage( 0, 0, self.image)
     def mousePressEvent(self, event):
-        subprocess.call("python 5-Race.py", shell=True)
+        subprocess.call("python3 5-Race.py", shell=True)
 
 
 class Game6(Frame):
@@ -87,7 +87,7 @@ class Game6(Frame):
     def paint(self, painter, option, widget):
         painter.drawImage( 0, 0, self.image)
     def mousePressEvent(self, event):
-        subprocess.call("python 6-Squeegee.py", shell=True)
+        subprocess.call("python3 6-Squeegee.py", shell=True)
 
 
 
