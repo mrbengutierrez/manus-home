@@ -1,10 +1,8 @@
-
+#include <stdio.h>
 #include <iostream> 
 #include <sys/ipc.h> 
 #include <sys/shm.h> 
 #include <stdio.h> 
-#include <string.h> 
-#include <stdlib.h> 
 using namespace std; 
   
 int main() 
@@ -17,18 +15,18 @@ int main()
   
     // shmat to attach to shared memory 
     char *str = (char*) shmat(shmid,(void*)0,0); 
-    char *data = (char *)malloc(sizeof(char)*1024);
-    strcpy( data, str );
   
-    printf("Data read from memory: %s\n",str); 
+    while(true)
+    {
+		cout<<"Write Data : "; 
+		//gets(str); // deprecated
+		fgets(str, 1024, stdin); 
+	}
+  
+    printf("Data written in memory: %s\n",str); 
       
     //detach from shared memory  
     shmdt(str); 
-    
-    // destroy the shared memory 
-    shmctl(shmid,IPC_RMID,NULL); 
-    printf("Data after: %s\n",data); 
-     
+  
     return 0; 
 } 
-
