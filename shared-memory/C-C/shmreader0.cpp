@@ -43,8 +43,8 @@ class NanotecSharedMemory
 		
 		static std::vector<std::string> splitString(std::string stringToSplit, std::string delimiter);
 		
-		static bool callFunctionFromString(std::vector<std::string> splittedStringVector);
-		
+		// execute parsed input from memory
+		static bool callFunctionUsingVector(std::vector<std::string> splittedStringVector);
 		
 	public: // Methods
 		
@@ -55,10 +55,11 @@ class NanotecSharedMemory
 		// read memory location
 		char* readMemory();	
 		
+		// write to memory location
 		void writeMemory(char* sequenceToWrite);
 		
-		void parseMemory();
-		
+		// execute instruction at memory location
+		bool executeMemory();
 	
 };
 
@@ -160,7 +161,7 @@ std::vector<std::string> NanotecSharedMemory::splitString(std::string stringToSp
 	return splittedStringVector;	
 }
 
-bool NanotecSharedMemory::callFunctionFromString(std::vector<std::string> splittedStringVector){
+bool NanotecSharedMemory::callFunctionUsingVector(std::vector<std::string> splittedStringVector){
 	std::string funcName = splittedStringVector.at(0);
 	int numArguments = splittedStringVector.size() - 1;
 	cout << "numArguments: " << numArguments << endl; // TESTING
@@ -199,18 +200,16 @@ bool NanotecSharedMemory::callFunctionFromString(std::vector<std::string> splitt
 	
 
 
-
-void NanotecSharedMemory::parseMemory() {
+/** Reads the shared memory location, and executes the instruction located there
+ * 
+ * @return true if there was a valid instruction in the shared memory location
+ *              and the instruction was executed successfully, else return false/
+ */
+bool NanotecSharedMemory::executeMemory() {
+	// Read the memory
 	char * const memoryPointer = this->readMemory(); // constant address, variable data
 	
-	// count commas
-	//const char delimiter = ',';
-	//const int numDelimiters = NanotecSharedMemory::countDelimiters(delimiter,memoryPointer,_numBytes);
-	
-	
-	//cout << "numDelimiters: " << numDelimiters << endl;
-	
-	
+	// Parse the memory by splitting into strings
 	std::string delimiter = ",";
 	std::string stringToSplit = memoryPointer;
 	std::vector<std::string> splittedStringVector = NanotecSharedMemory::splitString(stringToSplit, delimiter);
@@ -220,9 +219,9 @@ void NanotecSharedMemory::parseMemory() {
 		cout << "  Split: " << splittedStringVector.at(i) << endl;
 		
 	}
-	NanotecSharedMemory::callFunctionFromString(splittedStringVector);
 	
-	return;
+	// executed the parsed instruction
+	return NanotecSharedMemory::callFunctionUsingVector(splittedStringVector);
 }
 
 
@@ -236,7 +235,7 @@ int main()
     while(true) {
 		cout << endl;
 		char* dataRead = memObjPointer->readMemory();
-		memObjPointer->parseMemory();
+		memObjPointer->executeMemory();
 		
 		
 		sleep(2);
