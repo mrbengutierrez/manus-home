@@ -167,40 +167,32 @@ bool NanotecSharedMemory::callFunctionFromString(std::vector<std::string> splitt
 	
 	// printDog function call
 	if ( funcName.compare("printDog") == 0) {
-		cout << "here1" << endl; // TESTING
-		std::istringstream dogNameStream( splittedStringVector.at(1) );
-		char* dogName;
-		dogNameStream >> dogName;
-		cout << "here2" << endl; // TESTING
+		std::string dogNameString = splittedStringVector.at(1);
+		char* dogName =  &dogNameString[0u];
 		
-		std::istringstream dogAgeStream( splittedStringVector.at(2) );
-		int dogAge;
-		dogAgeStream >> dogAge;
+		int dogAge = std::stoi( splittedStringVector.at(2) );
 		
 		printDog(dogName, dogAge);
 		return true;
 	}
 	
-	/*
+	
 	// printCat function call
 	if (funcName.compare("printCat") == 0) {
-		std::istringstream catNameStream( splittedStringVector.at(1) );
-		char* catName;
-		catNameStream >> catName;
+		std::string catNameString = splittedStringVector.at(1);
+		char* catName =  &catNameString[0u];
 		
 		if (numArguments == 1) {
 			printCat(catName);
 			return true;
 		} 
 		// numArguments = 2
-		std::istringstream catAgeStream( splittedStringVector.at(2) );
-		double catAge;
-		catAgeStream >> catAge;
+		double catAge = std::stod( splittedStringVector.at(2) );
 			
 		printCat(catName,catAge);
 		return true;
 	}
-	*/
+	
 	
 	return false;
 }
@@ -244,10 +236,6 @@ int main()
     while(true) {
 		cout << endl;
 		char* dataRead = memObjPointer->readMemory();
-		cout << "Data Read: " << dataRead << endl;
-		char* dogName = "drover";
-		int dogAge = 3;
-		printDog(dogName,dogAge);
 		memObjPointer->parseMemory();
 		
 		
