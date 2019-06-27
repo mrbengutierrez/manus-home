@@ -62,9 +62,6 @@ class NanotecMotor
     
     // method to get the ID number of the motor
     int getID();
-
-    // Methods to test torque command of motor
-    void menu();
     
     // Modes of Operation
     void torqueMode(int torque = 0, int maxTorque = 1000, int maxCurr = 1800, int nomCurr = 1800, int slope = 1000);
@@ -73,7 +70,6 @@ class NanotecMotor
     
     // Methods to control motor
     void setTorque(int torque);
-    void torqueControlByAngleRange( double minA, double maxA );
     void setAngularVelocity( int angVel );   
     void setRelativeAngularPosition( double angPos, int angVel = 200 );
     void setAbsoluteAngularPosition( double angPos, int angVel = 200 );
@@ -91,10 +87,6 @@ class NanotecMotor
 
 
   private:
-
-    // Functions to do calculations and methods to display.
-    int calculateSpringForce( double disAng );
-    void message();
     
     // function to convert degrees to encoder ticks
     int degreesToVirtualEncoderTicks(double degrees);

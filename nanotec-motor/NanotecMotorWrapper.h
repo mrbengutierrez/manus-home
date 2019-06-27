@@ -29,7 +29,7 @@ extern "C"
 	{
 		return motor->angularVelocityMode(angVel);
 	}
-	void NanotecMotor_angularPositionMode(NanotecMotor* motor, double* angPos, int angVel)
+	void NanotecMotor_angularPositionMode(NanotecMotor* motor, double angPos, int angVel)
 	{
 		return motor->angularPositionMode(angPos, angVel);
 	}
@@ -48,9 +48,9 @@ extern "C"
 		return motor->setRelativeAngularPosition(angPos, angVel);
 	}
 	void NanotecMotor_setAbsoluteAngularPosition(NanotecMotor* motor, double angPos, int angVel)
+	{
 		return motor->setAbsoluteAngularPosition(angPos, angVel);
-	}	{
-
+	}
 	void NanotecMotor_setAbsoluteAngularPositionShortestPath(NanotecMotor* motor, double angPos, int angVel)
 	{
 		return motor->setAbsoluteAngularPositionShortestPath(angPos, angVel);

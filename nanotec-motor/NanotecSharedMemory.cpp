@@ -3,6 +3,7 @@
 #include "NanotecSharedMemory.h"
 
 
+
 // TESTING TESTING TESTING
 void printDog(char* dogName, int dogAge)
 {
@@ -146,7 +147,6 @@ bool NanotecSharedMemory::callFunctionUsingVector(std::vector<std::string> split
 		printCat(catName,catAge);
 		return true;
 	}
-	
 	
 	
 	return false;
