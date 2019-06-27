@@ -42,9 +42,6 @@ class NanotecMotor
     // keep track of motor mode
     enum _motorModeType {NONE, TORQUE, ANGULAR_VELOCITY, ANGULAR_POSITION};
     _motorModeType _motorMode;
-
-    //Last angle, difference and torque.
-    double _lastAng, _lastDif, _lastTor;
     
     // ID number of the motor
     int _ID;
