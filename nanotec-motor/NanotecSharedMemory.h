@@ -15,6 +15,7 @@
 #include "unistd.h"  // time
 #include <vector>   // vector for string container
 #include <sstream>     // string stream function for casting
+#include "NanotecMotor.h"  // for executing functions
 
 using namespace std; 
 

@@ -1,6 +1,13 @@
-
+/**
+ * This header file is definitions of the shared memory interface for the NanotecSharedMemory.h
+ * 
+ * @author Benjamin Gutierrez (bengutie@mit.edu)
+ * @date June 26, 2019
+ * 
+ */
 
 #include "NanotecSharedMemory.h"
+
 
 
 
@@ -147,6 +154,8 @@ bool NanotecSharedMemory::callFunctionUsingVector(std::vector<std::string> split
 		printCat(catName,catAge);
 		return true;
 	}
+	
+	// NanotecMotor function call
 	
 	
 	return false;
