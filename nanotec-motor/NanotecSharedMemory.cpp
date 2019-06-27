@@ -1,5 +1,5 @@
 /**
- * This header file is definitions of the shared memory interface for the NanotecSharedMemory.h
+ * This cpp file is definitions of the shared memory interface for the NanotecSharedMemory.h
  * 
  * @author Benjamin Gutierrez (bengutie@mit.edu)
  * @date June 26, 2019
@@ -7,6 +7,7 @@
  */
 
 #include "NanotecSharedMemory.h"
+
 
 
 
@@ -26,51 +27,68 @@ void printCat(char* catName, double catAge = 12.5)
 
 NanotecSharedMemory::NanotecSharedMemory()
 {
-	// ftok to generate unique key 
-	const int keyValue = 65;
-    key_t key = ftok("shmfile",keyValue); 
-  
-    // shmget returns an identifier in shmid 
-    _numBytes = 1024; // number of bytes of the shared memory location
-    _shmid = shmget(key,_numBytes,0666|IPC_CREAT); 
-  
-    // shmat to attach to shared memory 
-    _strPointer = (char*) shmat(_shmid,(void*)0,0);
+	
+
+	
+	int dataKey = 65; // Beware of collisions, check terminal: "ipcs -m"
+	_dataSharedMemory = new SharedMemory(dataKey);
+	
+	int statusKey = 88; // Beware of collisions, check terminal: "ipcs -m"
+	_statusSharedMemory = new SharedMemory(statusKey);
+	
+	
+	// Write empty empty sequence
+    _dataSharedMemory->writeMemory("EMPTY_DATA");
+    _statusSharedMemory->writeMemory("EMPTY_STATUS");
     
-    // Write empty character '\0' as the empty sequence
-    char emptyChar = '\0';
-    char * emptyCharPointer = &emptyChar;
-    this->writeMemory(emptyCharPointer); 
-    
+    cout << "Initial _dataSharedMemory: " << _dataSharedMemory->readMemory() << endl; 
+    cout << "Initial _statusSharedMemory: " << _statusSharedMemory->readMemory() << endl;
+	
 }
 
 NanotecSharedMemory::~NanotecSharedMemory()
 {
-	//detach from shared memory  
-    shmdt(_strPointer); 
-    
-    // destroy the shared memory 
-    shmctl(_shmid,IPC_RMID,NULL); 
+	//delete shared memory  
+    delete _dataSharedMemory;
+    delete _statusSharedMemory;
 }
 
- /**
-  * Returns a copy of the string in the shared memory location
-  */
-char* NanotecSharedMemory::readMemory()
+/**
+* Returns a copy of the string in the data shared memory location
+*/
+std::string NanotecSharedMemory::readData()
 {
-	char* dataPointer = (char *)malloc(sizeof(char)*_numBytes);
-	strcpy( dataPointer, _strPointer );
-	return dataPointer; 
+	return _dataSharedMemory->readMemory();
 }
 
-/** Writes a sequence of characters to the shared memory location
+/**
+* Returns a copy of the string in the status shared memory location
+*/
+std::string NanotecSharedMemory::readStatus()
+{
+	return _statusSharedMemory->readMemory();
+}
+
+/** Writes a string of characters to the data shared memory location
  * 
- * @param sequenceToWrite sequence to write to shared memory location
+ * @param stringToWrite string to write to data shared memory location
  */
-void NanotecSharedMemory::writeMemory(char* sequenceToWrite)
+void NanotecSharedMemory::writeData(std::string stringToWrite)
 {
-	strcpy(_strPointer,sequenceToWrite);
+	_dataSharedMemory->writeMemory(stringToWrite);
+	return;
 }
+
+/** Writes a string of characters to the status shared memory location
+ * 
+ * @param stringToWrite string to write to status shared memory location
+ */
+void NanotecSharedMemory::writeStatus(std::string stringToWrite)
+{
+	_statusSharedMemory->writeMemory(stringToWrite);
+	return;
+}
+
 
 /** Returns the number of delimiters in a char* sequence
  * 
@@ -168,11 +186,11 @@ bool NanotecSharedMemory::callFunctionUsingVector(std::vector<std::string> split
  */
 bool NanotecSharedMemory::executeMemory() {
 	// Read the memory
-	char * const memoryPointer = this->readMemory(); // constant address, variable data
+	std::string memoryString = this->readData(); // data memory
 	
 	// Parse the memory by splitting into strings
 	std::string delimiter = ",";
-	std::string stringToSplit = memoryPointer;
+	std::string stringToSplit = memoryString;
 	std::vector<std::string> splittedStringVector = NanotecSharedMemory::splitString(stringToSplit, delimiter);
 	
 	for (int i = 0; i != splittedStringVector.size(); i++)
@@ -195,7 +213,8 @@ int main()
     
     while(true) {
 		cout << endl;
-		char* dataRead = memObjPointer->readMemory();
+		cout << "dataRead: " << memObjPointer->readData() << endl;
+		cout << "statusRead: " << memObjPointer->readStatus()  << endl;
 		memObjPointer->executeMemory();
 		
 		

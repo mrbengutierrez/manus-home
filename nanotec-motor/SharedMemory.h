@@ -1,3 +1,6 @@
+#ifndef CLASS_SHAREDMEMORY
+#define CLASS_SHAREDMEMORY
+
 /**
  * This header file is responsible for managing the shared memory interface
  * 
@@ -24,7 +27,10 @@ class SharedMemory
 	private: // Variables
 		
 		// Pointer to the shared memory location
-		char *_strPointer;
+		char* _strPointer;
+		
+		// Pointer to last read value
+		char* _lastReadPointer;
 		
 		// shared memory id number
 		int _shmid;
@@ -42,9 +48,11 @@ class SharedMemory
 		~SharedMemory();
 		
 		// read memory location
-		char* readMemory();	
+		std::string readMemory();	
 		
 		// write to memory location
-		void writeMemory(char* sequenceToWrite);
+		void writeMemory(std::string sequenceToWrite);
 	
 };
+
+#endif

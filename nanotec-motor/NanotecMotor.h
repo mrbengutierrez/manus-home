@@ -1,5 +1,5 @@
-#ifndef CLASS_CONTROL
-#define CLASS_CONTROL
+#ifndef CLASS_NANOTECMOTOR
+#define CLASS_NANOTECMOTOR
 /**
  * Class NanotecMotor, header file.
  *

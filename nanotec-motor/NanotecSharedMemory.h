@@ -1,3 +1,6 @@
+#ifndef CLASS_NANOTECSHAREDMEMORY
+#define CLASS_NANOTECSHAREDMEMORY
+
 /**
  * This header file is responsible for managing the shared memory interface for the NanotecMotor.h
  * 
@@ -14,11 +17,10 @@
 #include <stdlib.h> 
 #include "unistd.h"  // time
 #include <vector>   // vector for string container
-#include <sstream>     // string stream function for casting
+
 #include "NanotecMotor.h"  // for executing functions
-
+#include "SharedMemory.h"  // include shared memory objects
 using namespace std; 
-
 
 
 
@@ -27,23 +29,20 @@ class NanotecSharedMemory
 	private: // Variables
 		
 		// Pointer to the shared memory location
-		char *_strPointer;
+		SharedMemory * _dataSharedMemory;
+		SharedMemory * _statusSharedMemory;
 		
-		// shared memory id number
-		int _shmid;
-		
-		// Size in bytes of the shared memory location
-		int _numBytes;
-		
-		
+	
 	private: // Methods
-		// counts the number of delimiters in a sequence
+		
 		static int countDelimiters(char delimiter, char* sequence, int sequenceLength);
 		
 		static std::vector<std::string> splitString(std::string stringToSplit, std::string delimiter);
 		
 		// execute parsed input from memory
 		static bool callFunctionUsingVector(std::vector<std::string> splittedStringVector);
+		
+		
 		
 	public: // Methods
 		
@@ -52,15 +51,18 @@ class NanotecSharedMemory
 		~NanotecSharedMemory();
 		
 		// read memory location
-		char* readMemory();	
+		std::string readData();
+		std::string readStatus();
 		
 		// write to memory location
-		void writeMemory(char* sequenceToWrite);
+		void writeData(std::string stringToWrite);
+		void writeStatus(std::string stringToWrite);
 		
 		// execute instruction at memory location
 		bool executeMemory();
 	
 };
 
+#endif
 
 
