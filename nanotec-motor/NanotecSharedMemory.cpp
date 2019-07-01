@@ -174,8 +174,26 @@ bool NanotecSharedMemory::callFunctionUsingVector(std::vector<std::string> split
 	}
 	
 	// NanotecMotor function call
-	
-	
+	if (funcName.compare("NanotecMotor") == 0) {
+		std::string serialPortString = splittedStringVector.at(1);
+		char* serialPort = &serialPortString[0u];
+		
+		if (numArguments == 1) {
+			NanotecMotor* motor = new NanotecMotor(serialPort);
+			const char* motorCharPointer = reinterpret_cast<const char*>(&motor);
+			std::string motorString( motorCharPointer);
+			this->writeStatus(motorString);
+			return true;
+		}
+		// numArguments == 2
+		int ID = std::stoi( splittedStringVector.at(2) );
+		NanotecMotor* motor = new NanotecMotor(serialPort,ID);
+		const char* motorCharPointer = reinterpret_cast<const char*>(&motor);
+		std::string motorString( motorCharPointer);
+		this->writeStatus(motorString);
+		return true;
+		
+	}
 	return false;
 }
 	
@@ -204,22 +222,33 @@ bool NanotecSharedMemory::executeMemory() {
 }
 
 
-
+std::string printAndExecute(std::string stringToPrint,NanotecSharedMemory* memObjPointer) {
+		
+		memObjPointer->writeData(stringToPrint);
+		
+		cout << endl;
+		std::string outputString = memObjPointer->executeMemory();
+		cout << "dataRead: " << memObjPointer->readData() << endl;
+		cout << "statusRead: " << memObjPointer->readStatus()  << endl;
+		return outputString;
+		
+}
 
 int main() 
+
 { 
     
     NanotecSharedMemory *memObjPointer = new NanotecSharedMemory();
     
-    while(true) {
-		cout << endl;
-		cout << "dataRead: " << memObjPointer->readData() << endl;
-		cout << "statusRead: " << memObjPointer->readStatus()  << endl;
-		memObjPointer->executeMemory();
-		
-		
+		printAndExecute("hello",memObjPointer);
 		sleep(2);
-	}
+		
+		printAndExecute("printCat,kit,4",memObjPointer);
+		sleep(2);
+		
+		printAndExecute("NanotecMotor,/dev/ttyACM0,12",memObjPointer);
+		sleep(2);
+
 	
 	delete memObjPointer;
   

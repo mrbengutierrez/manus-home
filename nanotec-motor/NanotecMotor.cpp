@@ -30,6 +30,7 @@ NanotecMotor::NanotecMotor(const char *serialPort, const int ID)
   // restart port
   stop();
   closePort();
+  delete _nanotec;
   _nanotec = new CommunicationNT(serialPort);
   
   _motorMode = NONE;

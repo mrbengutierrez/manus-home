@@ -40,7 +40,7 @@ class NanotecSharedMemory
 		static std::vector<std::string> splitString(std::string stringToSplit, std::string delimiter);
 		
 		// execute parsed input from memory
-		static bool callFunctionUsingVector(std::vector<std::string> splittedStringVector);
+		bool callFunctionUsingVector(std::vector<std::string> splittedStringVector);
 		
 		
 		
