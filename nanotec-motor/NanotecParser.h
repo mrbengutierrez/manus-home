@@ -17,7 +17,7 @@
 #include "unistd.h"  // time
 #include <vector>   // vector for string container
 #include <sstream>  // for string to memory address conversions
-#include <unordered_map>     // for function map
+#include <map>     // for function map
 
 
 #include "NanotecMotor.h"  // for executing functions
@@ -28,8 +28,14 @@ using namespace std;
 
 class NanotecParser
 {
-	//private: // Variables
-		//std::unordered_map<std::string, void*> _functionMap;
+	private: // Variables
+	
+		// keep track of NanotecMotor.h functions
+		typedef std::string (NanotecParser::* functionPointer)(std::vector<std::string>);
+		std::map<std::string, functionPointer> _functionMap; // "func_name" : func_name
+		
+		// keep track of motors used
+		std::map<std::string, NanotecMotor*>* _motorMap; // "serial port" : motor_pointer
 	
 	private: // Methods
 		
@@ -54,26 +60,26 @@ class NanotecParser
 		
 		//Methods to interface with NanotecMotor.h
 		
-		static std::string nanotecMotor(std::vector<std::string> argumentVector);
-		static std::string getID(std::vector<std::string> argumentVector);
+		std::string nanotecMotor(std::vector<std::string> argumentVector);
+		std::string getID(std::vector<std::string> argumentVector);
 		
-		static std::string torqueMode( std::vector<std::string> argumentVector );
-		static std::string angularVelocityMode( std::vector<std::string> argumentVector );
-		static std::string angularPositionMode( std::vector<std::string> argumentVector );
+		std::string torqueMode( std::vector<std::string> argumentVector );
+		std::string angularVelocityMode( std::vector<std::string> argumentVector );
+		std::string angularPositionMode( std::vector<std::string> argumentVector );
 		
-		static std::string setTorque( std::vector<std::string> argumentVector );
-		static std::string setAngularVelocity( std::vector<std::string> argumentVector );
-		static std::string setRelativeAngularPosition( std::vector<std::string> argumentVector );
-		static std::string setAbsoluteAngularPosition( std::vector<std::string> argumentVector );
-		static std::string setAbsoluteAngularPositionShortestPath( std::vector<std::string> argumentVector );
-		static std::string stop( std::vector<std::string> argumentVector );
+		std::string setTorque( std::vector<std::string> argumentVector );
+		std::string setAngularVelocity( std::vector<std::string> argumentVector );
+		std::string setRelativeAngularPosition( std::vector<std::string> argumentVector );
+		std::string setAbsoluteAngularPosition( std::vector<std::string> argumentVector );
+		std::string setAbsoluteAngularPositionShortestPath( std::vector<std::string> argumentVector );
+		std::string stop( std::vector<std::string> argumentVector );
 		
-		static std::string getTorque( std::vector<std::string> argumentVector );
-		static std::string getAngularVelocity( std::vector<std::string> argumentVector );
-		static std::string getAbsoluteAngularPosition( std::vector<std::string> argumentVector );
-		static std::string readPhysicalEncoder( std::vector<std::string> argumentVector );
+		std::string getTorque( std::vector<std::string> argumentVector );
+		std::string getAngularVelocity( std::vector<std::string> argumentVector );
+		std::string getAbsoluteAngularPosition( std::vector<std::string> argumentVector );
+		std::string readPhysicalEncoder( std::vector<std::string> argumentVector );
 		
-		static std::string closePort( std::vector<std::string> argumentVector );
+		std::string closePort( std::vector<std::string> argumentVector );
 		
 		
 
@@ -81,10 +87,10 @@ class NanotecParser
 	public: // Methods
 		
 		// constructor
-		//NanotecParser();
+		NanotecParser();
 		
 		// parses string and executes using NanotecMotor.h
-		static std::string execute(std::string stringToExecute);
+		std::string execute(std::string stringToExecute);
 		
 		// join multiple strings using a delimiter
 		static std::string stringJoiner( std::vector<std::string> stringVector, std::string deliminator );

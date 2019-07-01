@@ -210,25 +210,44 @@ std::string NanotecParser::stringJoiner( std::vector<std::string> stringVector, 
  * Format: <"function_name","arg1","arg2",...> 
  */
 std::string NanotecParser::nanotecMotor(std::vector<std::string> argumentVector) {
-	int numArguments = argumentVector.size() - 1;
+
+	// initialize variables for _motorMap
+	std::string serialPortString = argumentVector.at(1);
+
 	
+	// make sure motor is not already in use
+	if ( _motorMap->count(serialPortString) == 1 ) { // BUG HERE
+		cout << "here001" << endl;  // TESTING
+		cout << "Error: Motor using serial port " << serialPortString << " already exists." << endl;
+		throw;
+	}
+	
+	
+	cout << "here1" << endl;  // TESTING
 	char* serialPort = NanotecParser::stringToCharPointer( argumentVector.at(1) );
-		
+	
+	cout << "here2" << endl;  // TESTING
+	int numArguments = argumentVector.size() - 1;
 	if (numArguments == 1) {
 		NanotecMotor* motor = new NanotecMotor(serialPort);
-		const char* motorCharPointer = reinterpret_cast<const char*>(motor);
-		std::string motorString( motorCharPointer);
-		delete serialPort;
-		return motorString;
+		(*_motorMap)[serialPortString] = motor; // and motor to motor map
+		delete serialPort; // free char* memory
+		
+	} else { // numArguments == 2
+		int ID = NanotecParser::stringToInt( argumentVector.at(2) );
+		cout << "here4" << endl;  // TESTING
+		NanotecMotor* motor = new NanotecMotor(serialPort,ID);
+		cout << "here5" << endl;  // TESTING
+		pair<std::string,NanotecMotor*> keyValuePair(serialPortString,motor);
+		cout << "serialPortString: " << serialPortString << endl;
+		cout << "motorID: " << motor->getID() << endl;
+		_motorMap->insert(keyValuePair);
+		//(*_motorMap)[serialPortString] = motor; // and motor to motor map
+		cout << "here6" << endl;  // TESTING
+		delete serialPort; // free char* memory
 	}
-	// numArguments == 2
-	int ID = NanotecParser::stringToInt( argumentVector.at(2) );
-	NanotecMotor* motor = new NanotecMotor(serialPort,ID);
-	cout << "initial ID: " << motor->getID() << endl; // TESTING
-	const char* motorCharPointer = reinterpret_cast<const char*>(motor);
-	std::string motorString( motorCharPointer);
-	delete serialPort;
-	return motorString;	
+	cout << "here7" << endl;  // TESTING
+	return serialPortString;
 }
 
 /** Calls getID using parsed instruction vector
@@ -238,9 +257,8 @@ std::string NanotecParser::nanotecMotor(std::vector<std::string> argumentVector)
  * Format: <"function_name","arg1","arg2",...> 
  */
 std::string NanotecParser::getID(std::vector<std::string> argumentVector) {
-	std::string motorString = argumentVector.at(1);
-	char* motorCharPointer = NanotecParser::stringToCharPointer( argumentVector.at(1) );
-	NanotecMotor* motorPointer = reinterpret_cast<NanotecMotor*>(motorCharPointer);
+	std::string serialPort = argumentVector.at(1);
+	NanotecMotor* motorPointer = _motorMap->at(serialPort);
 		
 	cout << "here2" << endl;  // TESTING
 	int ID = motorPointer->getID();
@@ -375,9 +393,7 @@ std::string NanotecParser::execute(std::string stringToExecute) {
 		return (*functionPointer)(splittedStringVector); // call function using function pointer
 	}
 	*/
-	
 	int isEqual = 0;
-	
 	if (funcName.compare("NanotecMotor") == isEqual) {
 		return NanotecParser::nanotecMotor(splittedStringVector);
 	}
@@ -397,6 +413,50 @@ std::string NanotecParser::execute(std::string stringToExecute) {
 
 
 /**
+ * Default Constructor
+ * 
+ * 
+ */
+NanotecParser::NanotecParser() {
+	
+	// initialize the motor map
+	_motorMap = new map<std::string,NanotecMotor*>();
+	
+	// Initialize function map with all fo the NanotecParser functions
+	// that are used to call the NanotecMotor.h functions
+	_functionMap["nanotecMotor"] = &NanotecParser::nanotecMotor;
+	_functionMap["getID"] = &NanotecParser::getID;
+
+
+	
+	
+	
+	/*
+	_functionMap["torqueMode"] = &NanotecParser::torqueMode;
+	_functionMap["angularVelocityMode"] = &NanotecParser::angularVelocityMode;
+	_functionMap["angularPositionMode"] = &NanotecParser::angularPositionMode;
+	
+	_functionMap["setTorque"] = &NanotecParser::setTorque;
+	_functionMap["setAngularVelocity"] = &NanotecParser::setAngularVelocity;
+	_functionMap["setRelativeAngularPosition"] = &NanotecParser::setRelativeAngularPosition;
+	_functionMap["setAbsoluteAngularPosition"] = &NanotecParser::setAbsoluteAngularPosition;
+	_functionMap["setAbsoluteAngularPositionShortestPath"] = &NanotecParser::setAbsoluteAngularPositionShortestPath;
+	_functionMap["stop"] = &NanotecParser::stop;
+	
+	_functionMap["getTorque"] = &NanotecParser::getTorque;
+	_functionMap["getAngularVelocity"] = &NanotecParser::getAngularVelocity;
+	_functionMap["getAngularPosition"] = &NanotecParser::getAbsoluteAngularPosition;
+	_functionMap["readEncoder"] = &NanotecParser::readPhysicalEncoder;
+	
+	_functionMap["closePort"] = &NanotecParser::closePort;
+	*/
+	
+}
+
+
+
+
+/**
  * Main function performs tests to test parser. Requires a nanotec motor to be connected.
  * 
  * 
@@ -407,21 +467,23 @@ int main()
     std::vector<std::string> stringVector;
     std::string delimiter = ",";
     
-    NanotecParser::execute("printDog,pup,4");
+    NanotecParser* Parser;
+    
+    Parser->execute("printDog,pup,4");
 	sleep(1);
 		
-	NanotecParser::execute("printCat,kit,3.5");
+	Parser->execute("printCat,kit,3.5");
 	sleep(1);
 	
 	instruction	= "NanotecMotor,/dev/ttyACM0,12";
-	std::string motor1 = NanotecParser::execute(instruction);
+	std::string motor1 = Parser->execute(instruction);
 	sleep(1);
 		
 	stringVector.clear();
 	stringVector.push_back("getID");
 	stringVector.push_back(motor1);
 	instruction = NanotecParser::stringJoiner( stringVector, delimiter );
-	std::string ID = NanotecParser::execute(instruction);
+	std::string ID = Parser->execute(instruction);
 	cout << "getID: " << ID << endl;
 	
   
@@ -527,29 +589,4 @@ std::string NanotecParser::callFunctionUsingVector(std::vector<std::string> spli
 
 
 
-/*
-NanotecParser::NanotecParser() {
-	_functionMap["nanotecMotor"] = NanotecParser::nanotecMotor;
-	_functionMap["getID"] = NanotecParser::getID;
-	
-	
-	_functionMap["torqueMode"] = NanotecParser::torqueMode;
-	_functionMap["angularVelocityMode"] = NanotecParser::angularVelocityMode;
-	_functionMap["angularPositionMode"] = NanotecParser::angularPositionMode;
-	
-	_functionMap["setTorque"] = NanotecParser::setTorque;
-	_functionMap["setAngularVelocity"] = NanotecParser::setAngularVelocity;
-	_functionMap["setRelativeAngularPosition"] = NanotecParser::setRelativeAngularPosition;
-	_functionMap["setAbsoluteAngularPosition"] = NanotecParser::setAbsoluteAngularPosition;
-	_functionMap["setAbsoluteAngularPositionShortestPath"] = NanotecParser:setAbsoluteAngularPositionShortestPath;
-	_functionMap["stop"] = NanotecParser::stop;
-	
-	_functionMap["getTorque"] = NanotecParser::getTorque;
-	_functionMap["getAngularVelocity"] = NanotecParser::getAngularVelocity;
-	_functionMap["getAngularPosition"] = NanotecParser::getAngularPosition;
-	_functionMap["readEncoder"] = NanotecParser::readEncoder;
-	
-	_functionMap["closePort"] = NanotecParser::closePort;
-	
-}
-*/
+
