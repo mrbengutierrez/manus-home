@@ -214,35 +214,27 @@ std::string NanotecParser::nanotecMotor(std::vector<std::string> argumentVector)
 	// initialize variables for _motorMap
 	std::string serialPortString = argumentVector.at(1);
 
-	
 	// make sure motor is not already in use
-	if ( _motorMap->count(serialPortString) == 1 ) { // BUG HERE
-		cout << "here001" << endl;  // TESTING
+	if ( _motorContainer.contains(serialPortString)) { 
 		cout << "Error: Motor using serial port " << serialPortString << " already exists." << endl;
 		throw;
 	}
-	
-	
-	cout << "here1" << endl;  // TESTING
+
 	char* serialPort = NanotecParser::stringToCharPointer( argumentVector.at(1) );
 	
 	cout << "here2" << endl;  // TESTING
 	int numArguments = argumentVector.size() - 1;
 	if (numArguments == 1) {
-		NanotecMotor* motor = new NanotecMotor(serialPort);
-		(*_motorMap)[serialPortString] = motor; // and motor to motor map
-		delete serialPort; // free char* memory
+		//NanotecMotor* motor = new NanotecMotor(serialPort);
+		//(_motorMap)[serialPortString] = motor; // and motor to motor map
+		//delete serialPort; // free char* memory
 		
 	} else { // numArguments == 2
 		int ID = NanotecParser::stringToInt( argumentVector.at(2) );
 		cout << "here4" << endl;  // TESTING
-		NanotecMotor* motor = new NanotecMotor(serialPort,ID);
+		NanotecMotor motor = NanotecMotor(serialPort,ID);
 		cout << "here5" << endl;  // TESTING
-		pair<std::string,NanotecMotor*> keyValuePair(serialPortString,motor);
-		cout << "serialPortString: " << serialPortString << endl;
-		cout << "motorID: " << motor->getID() << endl;
-		_motorMap->insert(keyValuePair);
-		//(*_motorMap)[serialPortString] = motor; // and motor to motor map
+		_motorContainer.insert(serialPort,motor);
 		cout << "here6" << endl;  // TESTING
 		delete serialPort; // free char* memory
 	}
@@ -258,10 +250,11 @@ std::string NanotecParser::nanotecMotor(std::vector<std::string> argumentVector)
  */
 std::string NanotecParser::getID(std::vector<std::string> argumentVector) {
 	std::string serialPort = argumentVector.at(1);
-	NanotecMotor* motorPointer = _motorMap->at(serialPort);
+	NanotecMotor motor = _motorContainer.getMotor(serialPort);
+	
 		
 	cout << "here2" << endl;  // TESTING
-	int ID = motorPointer->getID();
+	int ID = motor.getID();
 	cout << "ID: " << ID << endl;  // TESTING
 	return NanotecParser::intToString( ID );
 }
@@ -420,12 +413,12 @@ std::string NanotecParser::execute(std::string stringToExecute) {
 NanotecParser::NanotecParser() {
 	
 	// initialize the motor map
-	_motorMap = new map<std::string,NanotecMotor*>();
+	//_motorMap = new map<std::string,NanotecMotor*>();
 	
 	// Initialize function map with all fo the NanotecParser functions
 	// that are used to call the NanotecMotor.h functions
-	_functionMap["nanotecMotor"] = &NanotecParser::nanotecMotor;
-	_functionMap["getID"] = &NanotecParser::getID;
+	//_functionMap["nanotecMotor"] = &NanotecParser::nanotecMotor;
+	//_functionMap["getID"] = &NanotecParser::getID;
 
 
 	

@@ -15,6 +15,15 @@
 // enumeration to keep track of motor mode types
 //enum _motorModeType {NONE, TORQUE, ANGULAR_VELOCITY, ANGULAR_POSITION};
 
+
+/** Default constructor for initializing containers
+ * 
+ * does nothing, DO NOT CALL
+ */
+NanotecMotor::NanotecMotor() {
+}
+
+
 /**
  * Default Constructor.
  * 

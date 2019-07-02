@@ -19,7 +19,7 @@
 #include <sstream>  // for string to memory address conversions
 #include <map>     // for function map
 
-
+#include "NanotecMotorContainer.h" // for managing multiple nanotec motors
 #include "NanotecMotor.h"  // for executing functions
 using namespace std; 
 
@@ -31,11 +31,12 @@ class NanotecParser
 	private: // Variables
 	
 		// keep track of NanotecMotor.h functions
-		typedef std::string (NanotecParser::* functionPointer)(std::vector<std::string>);
-		std::map<std::string, functionPointer> _functionMap; // "func_name" : func_name
+		//typedef std::string (NanotecParser::* functionPointer)(std::vector<std::string>);
+		//std::map<std::string, functionPointer> _functionMap; // "func_name" : func_name
 		
 		// keep track of motors used
-		std::map<std::string, NanotecMotor*>* _motorMap; // "serial port" : motor_pointer
+		NanotecMotorContainer _motorContainer; // "serial port" : motor_pointer
+		
 	
 	private: // Methods
 		
@@ -95,5 +96,6 @@ class NanotecParser
 		// join multiple strings using a delimiter
 		static std::string stringJoiner( std::vector<std::string> stringVector, std::string deliminator );
 };
+
 
 #endif
