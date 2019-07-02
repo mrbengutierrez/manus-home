@@ -21,7 +21,6 @@ NanotecMotorContainer::NanotecMotorContainer() {
  * @param motor NanotecMotor object that is used by the Nanotec motor
  */
 void NanotecMotorContainer::insert(NanotecMotor* motor) {
-	cout << "Inserted at _numMotors = " <<  _numMotors << endl;  // TESTING
 	_nanotecMotorArray[_numMotors] = motor;
 	_numMotors++;
 	return;
@@ -105,7 +104,7 @@ void NanotecMotorContainer::removeMotor(std::string serialPort) {
  * 
  * 
  */
- 
+/*
 int main() 
 {
 
@@ -152,4 +151,5 @@ int main()
     cout << endl;
     return 0; 
 } 
+*/
 

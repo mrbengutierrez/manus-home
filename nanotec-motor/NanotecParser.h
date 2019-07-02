@@ -17,7 +17,7 @@
 #include "unistd.h"  // time
 #include <vector>   // vector for string container
 #include <sstream>  // for string to memory address conversions
-#include <map>     // for function map
+#include <unordered_map>     // for function map
 
 #include "NanotecMotorContainer.h" // for managing multiple nanotec motors
 #include "NanotecMotor.h"  // for executing functions
@@ -31,8 +31,8 @@ class NanotecParser
 	private: // Variables
 	
 		// keep track of NanotecMotor.h functions
-		//typedef std::string (NanotecParser::* functionPointer)(std::vector<std::string>);
-		//std::map<std::string, functionPointer> _functionMap; // "func_name" : func_name
+		typedef std::string (NanotecParser::* functionPointerType)(std::vector<std::string>);
+		std::unordered_map<std::string, functionPointerType> _functionMap; // "func_name" : func_name
 		
 		// keep track of motors used
 		NanotecMotorContainer* _motorContainerPointer; // "serial port" : motor_pointer
@@ -61,6 +61,7 @@ class NanotecParser
 		
 		std::string nanotecMotor(std::vector<std::string> argumentVector);
 		std::string getID(std::vector<std::string> argumentVector);
+		std::string getSerialPort(std::vector<std::string> argumentVector);
 		
 		std::string torqueMode( std::vector<std::string> argumentVector );
 		std::string angularVelocityMode( std::vector<std::string> argumentVector );
