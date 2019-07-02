@@ -44,9 +44,7 @@ class NanotecMotor
     _motorModeType _motorMode;
     
     // ID number of the motor
-    int _ID;
-    char* getSerialPort();
-    
+    int _ID;   
     char* _serialPort;
     
     
@@ -66,6 +64,7 @@ class NanotecMotor
     
     // method to get the ID number of the motor
     int getID();
+    char* getSerialPort();
     
     // Modes of Operation
     void torqueMode(int torque = 0, int maxTorque = 1000, int maxCurr = 1800, int nomCurr = 1800, int slope = 1000);

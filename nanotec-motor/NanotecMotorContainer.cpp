@@ -20,23 +20,40 @@ NanotecMotorContainer::NanotecMotorContainer() {
  * 		  serialPort 
  * @param motor NanotecMotor object that is used by the Nanotec motor
  */
-void NanotecMotorContainer::insert(std::string serialPort, NanotecMotor* motor) {
+void NanotecMotorContainer::insert(NanotecMotor* motor) {
 	cout << "Inserted at _numMotors = " <<  _numMotors << endl;  // TESTING
-	_serialPortVector.push_back(serialPort);
 	_nanotecMotorArray[_numMotors] = motor;
 	_numMotors++;
 	return;
 }
+
+
+/** Returns the NanotecMotor using the serialport, if nanotec motor does not exist returns -1
+ * 
+ * @param serialPort name of the serialport that the nanotec motor is using
+ * 
+ */		
+int NanotecMotorContainer::getMotorIndex(std::string serialPort) {
+	for(int i = 0; i != _numMotors; i++) { // for each motor
+		char* currentSerialPortPointer = _nanotecMotorArray[i]->getSerialPort(); // get char* serial port, returns copy of char*
+		std::string currentSerialPort( currentSerialPortPointer ); // get string serial port
+		if ( currentSerialPort.compare(serialPort) == 0 ) {
+			delete currentSerialPortPointer; // free char* memory
+			return i;
+		}
+		delete currentSerialPortPointer; // free char* memory
+	}
+	return -1;
+}
+
 
 /** Returns true if the container contains a motor with the serialPort specified, else returns false
  * 
  * @param serialPort name of the serialport that the nanotec motor is using
  */		
 bool NanotecMotorContainer::contains(std::string serialPort) {
-	for(int i = 0; i != _serialPortVector.size(); i++) {
-		if ( _serialPortVector.at(i).compare(serialPort) == 0 ) {
-			true;
-		}
+	if (getMotorIndex(serialPort) != -1 ) {
+		return true;
 	}
 	return false;
 }
@@ -48,17 +65,14 @@ bool NanotecMotorContainer::contains(std::string serialPort) {
  *        serialPort must be in the NanotecMotorContainer
  */		
 NanotecMotor* NanotecMotorContainer::getMotor(std::string serialPort) {
-	cout << "Inside Container" << endl;  // TESTING
-	for(int i = 0; i != _serialPortVector.size(); i++) {
-		if ( _serialPortVector.at(i).compare(serialPort) == 0 ) {
-			cout << "motorPointer found at i = " << i << endl;  // TESTING
-			NanotecMotor* motorPointer = _nanotecMotorArray[i];
-			cout << "motorPointer variable assigned" << endl;  // TESTING
-			return motorPointer;
-		}
+	int index = getMotorIndex(serialPort);
+	
+	// if nanotec motor does not exist throw exception
+	if (index == -1) {
+		cout << "Error motor using serialport " << serialPort << " not in nanotec motor container" << endl;
+		throw;
 	}
-	cout << "Error motor using serialport " << serialPort << " not in nanotec motor container" << endl;
-	throw;
+	return _nanotecMotorArray[index];
 }
 
 
@@ -68,19 +82,20 @@ NanotecMotor* NanotecMotorContainer::getMotor(std::string serialPort) {
  *        serialPort must be in the NanotecMotorContainer
  */		
 void NanotecMotorContainer::removeMotor(std::string serialPort) {
-	for(int i = 0; i != _serialPortVector.size(); i++) {
-		if ( _serialPortVector.at(i).compare(serialPort) == 0 ) {
-			_serialPortVector.erase(_serialPortVector.begin() + i);
-			NanotecMotor* motorPointer = _nanotecMotorArray[i];
-			delete motorPointer;
-			for (int j = i; i < _numMotors; ++i)
-				_nanotecMotorArray[i] = _nanotecMotorArray[i + 1]; // copy next element left
-			_numMotors--;
-			return;
-		}
+	int index = getMotorIndex(serialPort);
+	
+	// if nanotec motor does not exist throw exception
+	if (index == -1) { 
+		cout << "Error motor using serialport " << serialPort << " not in nanotec motor container" << endl;
+		throw;
 	}
-	cout << "Error motor using serialport " << serialPort << " not in nanotec motor container" << endl;
-	throw;
+	
+	// shift all elements left into the deleted entry
+	for (int i = index; i < _numMotors; ++i) {
+		_nanotecMotorArray[i] = _nanotecMotorArray[i + 1]; // copy next element left
+	}
+	_numMotors--; // decrement num of motors by 1
+	return;
 }
 
 
@@ -90,7 +105,7 @@ void NanotecMotorContainer::removeMotor(std::string serialPort) {
  * 
  * 
  */
- /*
+ 
 int main() 
 {
 
@@ -102,36 +117,39 @@ int main()
     NanotecMotorContainer* motorContainerPointer = new NanotecMotorContainer();
     
     cout << "Before Insertion" << endl;
-    cout << "contains(motor1): " << motorContainerPointer.contains(serialPort1) << endl;
-    cout << "contains(motor2): " << motorContainerPointer.contains(serialPort2) << endl;
+    cout << "contains(motor1): " << motorContainerPointer->contains(serialPort1) << endl;
+    cout << "contains(motor2): " << motorContainerPointer->contains(serialPort2) << endl;
     cout << endl;
     
     
     motorContainerPointer->insert(motorPointer1);
     cout << "Insert motor1" << endl;
-    cout << "contains(motor1): " << motorContainerPointer.contains(serialPort1) << endl;
-    cout << "contains(motor2): " << motorContainerPointer.contains(serialPort2) << endl;
+    cout << "contains(motor1): " << motorContainerPointer->contains(serialPort1) << endl;
+    cout << "contains(motor2): " << motorContainerPointer->contains(serialPort2) << endl;
     cout << endl;
     
     motorContainerPointer->insert(motorPointer2);
     cout << "Insert motor2" << endl;
-    cout << "contains(motor1): " << motorContainerPointer.contains(serialPort1) << endl;
-    cout << "contains(motor2): " << motorContainerPointer.contains(serialPort2) << endl;
+    cout << "contains(motor1): " << motorContainerPointer->contains(serialPort1) << endl;
+    cout << "contains(motor2): " << motorContainerPointer->contains(serialPort2) << endl;
     cout << endl;
     
-    motorContainerPointer->insert(motorPointer2);
     cout << "Test getMotor" << endl;
-    cout << "motor1 ID: " << motorContainerPointer.getMotor(serialPort1)->getID() << endl;
-    cout << "motor2 ID: " << motorContainerPointer.getMotor(serialPort2)->getID() << endl;
+    cout << "motor1 ID: " << motorContainerPointer->getMotor(serialPort1)->getID() << endl;
+    cout << "motor2 ID: " << motorContainerPointer->getMotor(serialPort2)->getID() << endl;
     cout << endl;
     
-    motorContainerPointer->removeMotor(motorPointer1);
-    cout << "Test getMotor" << endl;
-    cout << "motor1 ID: " << motorContainerPointer.getMotor(serialPort1)->getID() << endl;
-    cout << "motor2 ID: " << motorContainerPointer.contains(serialPort2)->getID() << endl;
+    motorContainerPointer->removeMotor(serialPort1);
+    cout << "Remove motor1" << endl;
+    cout << "contains(motor1): " << motorContainerPointer->contains(serialPort1) << endl;
+    cout << "contains(motor2): " << motorContainerPointer->contains(serialPort2) << endl;
     cout << endl;
-	
-  
+    
+    motorContainerPointer->removeMotor(serialPort2);
+    cout << "Remove motor2" << endl;
+    cout << "contains(motor1): " << motorContainerPointer->contains(serialPort1) << endl;
+    cout << "contains(motor2): " << motorContainerPointer->contains(serialPort2) << endl;
+    cout << endl;
     return 0; 
 } 
-*/
+

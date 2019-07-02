@@ -27,20 +27,19 @@ class NanotecMotorContainer
 {
 	private: // Variables
 	
-		// vectors maintain rep invariant
-		// ideally it would be better to use a map for constant time lookups
-		// however there were issues in getting the NanotecParser to work when
-		// using a map to maintain the rep invariant.
-		std::vector<std::string> _serialPortVector; // "serial port" : motor_pointer
+		// array maintain rep invariant, chosen to manage memory of motors
 		NanotecMotor* _nanotecMotorArray[maxNumberofMotors];
 		
 		int _numMotors;
+	
+	private: // Methods
+		int getMotorIndex(std::string serialPort);
 	
 	public: // Methods
 	
 		NanotecMotorContainer();
 		
-		void insert(std::string serialPort, NanotecMotor* motor);
+		void insert(NanotecMotor* motor);
 		
 		bool contains(std::string serialPort);
 		
