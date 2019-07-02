@@ -9,24 +9,6 @@
 #include "NanotecParser.h"
 
 //-----------------------------------------------------------------------------------------------------
-// Being TESTING functions
-
-// TESTING TESTING TESTING
-void printDog(char* dogName, int dogAge)
-{
-	cout << "printDog, name: " << dogName << ", age: " << dogAge << endl;
-}
-// TESTING TESTING TESTING
-void printCat(char* catName, double catAge = 12.5)
-{
-	cout << "printCat, name: " << catName << ", age: " << catAge << endl;
-}
-
-// End TESTING functions
-//-----------------------------------------------------------------------------------------------------
-
-
-//-----------------------------------------------------------------------------------------------------
 
 /** Converts a string to a double
  * 
@@ -535,59 +517,7 @@ std::string NanotecParser::execute(std::string stringToExecute) {
 	
 	
 
-	int numArguments = splittedStringVector.size() -1;
-	
-	// TESTING
-	/*
-	cout << endl;
-	cout << "numArguments: " << numArguments << endl; // TESTING
-	
-	// TESTING
-	for (int i = 0; i != splittedStringVector.size(); i++)
-	{
-		cout << "  Split: " << splittedStringVector.at(i) << endl;	
-	}
-	*/
-	
-	
-	// printDog function call
-	if ( funcName.compare("printDog") == 0) 
-	{
-		std::string stringToConvert( splittedStringVector.at(1) );
-		char* dogName =  NanotecParser::stringToCharPointer( stringToConvert );
-		
-		cout << "dogName: " << dogName << endl; // TESTING
-		for (int i = 0; i != splittedStringVector.size(); i++) { cout << "    Split: " << splittedStringVector.at(i) << endl;} // TESTING
-		
-		std::string stringToConvert2( splittedStringVector.at(2) );
-		int dogAge = NanotecParser::stringToInt( stringToConvert2 );
-		
-		cout << "dogName: " << dogName << endl; // TESTING
-		for (int i = 0; i != splittedStringVector.size(); i++) { cout << "    Split: " << splittedStringVector.at(i) << endl;} // TESTING
-		printDog(dogName, dogAge);
-		
-		delete dogName;
-		return "";
-	}
-	
-	// printCat function call
-	if (funcName.compare("printCat") == 0) 
-	{
-		char* catName =  NanotecParser::stringToCharPointer( splittedStringVector.at(1) );
-		cout << "catName: "<< catName << endl;
-		
-		if (numArguments == 1) {
-			printCat(catName);
-			return "";
-		} 
-		// numArguments = 2
-		double catAge = NanotecParser::stringToDouble( splittedStringVector.at(2) );
-			
-		cout << "catName: "<< catName << endl;
-		printCat(catName,catAge);
-		return "";
-	}
-	
+	int numArguments = splittedStringVector.size() -1;		
 	
 	// check if funcName is one a valid function defined in the function map
 	if (_functionMap.count(funcName) == 1) {
@@ -667,8 +597,8 @@ NanotecParser::NanotecParser() {
 
 
 
-
-
+// Uncomment to test the NanotecParser
+/*
 // For testing Parser
 void printMotorInformation(NanotecParser* Parser, std::string serialPort) {
 	
@@ -721,12 +651,6 @@ int main()
     std::string delimiter = ",";
     
     NanotecParser* Parser = new NanotecParser();
-    
-    Parser->execute("printDog,pup,4");
-	sleep(1);
-		
-	Parser->execute("printCat,kit,3.5");
-	sleep(1);
 	
 	
 	// initialize motors
@@ -852,13 +776,10 @@ int main()
 	Parser->execute(instruction);
 	instruction = "closePort," + serialPort2;
 	Parser->execute(instruction);
-	
-
-	
   
     return 0; 
 } 
-
+*/
 
 
 

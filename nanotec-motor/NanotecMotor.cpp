@@ -18,7 +18,7 @@
 
 /** Default constructor for initializing containers
  * 
- * does nothing, DO NOT CALL
+ * does nothing, DO NOT CALL. Leave uncommented.
  */
  /*
 NanotecMotor::NanotecMotor() {
@@ -26,7 +26,7 @@ NanotecMotor::NanotecMotor() {
 */
 
 NanotecMotor& NanotecMotor::operator=(const NanotecMotor &oldNanotecMotor) {
-	cout << "Nanotec Motor is being assigned. This is not allowed." << endl;
+	cout << "Nanotec Motor is being copy assigned. This is not allowed." << endl;
 	throw;
 }
 
