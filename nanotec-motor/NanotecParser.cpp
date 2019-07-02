@@ -232,9 +232,12 @@ std::string NanotecParser::nanotecMotor(std::vector<std::string> argumentVector)
 	} else { // numArguments == 2
 		int ID = NanotecParser::stringToInt( argumentVector.at(2) );
 		cout << "here4" << endl;  // TESTING
-		NanotecMotor motor = NanotecMotor(serialPort,ID);
+		NanotecMotor* motorPointer = new NanotecMotor(serialPort,ID);
+		cout << "motorPointer (initial): " << motorPointer << endl;  // TESTING
+		//NanotecMotor motor = *motorPointer;
 		cout << "here5" << endl;  // TESTING
-		_motorContainer.insert(serialPort,motor);
+		_motorContainer.insert(serialPort,motorPointer);
+		NanotecMotor* motorPointer2 = _motorContainer.getMotor(serialPort);
 		cout << "here6" << endl;  // TESTING
 		delete serialPort; // free char* memory
 	}
@@ -249,12 +252,16 @@ std::string NanotecParser::nanotecMotor(std::vector<std::string> argumentVector)
  * Format: <"function_name","arg1","arg2",...> 
  */
 std::string NanotecParser::getID(std::vector<std::string> argumentVector) {
+	cout << "here8" << endl;  // TESTING
 	std::string serialPort = argumentVector.at(1);
-	NanotecMotor motor = _motorContainer.getMotor(serialPort);
+	cout << "here9" << endl;  // TESTING
+	NanotecMotor* motorPointer = _motorContainer.getMotor(serialPort);
+	//NanotecMotor motor = *motorPointer;
+	cout << "motorPointer (final): " << motorPointer << endl;  // TESTING
 	
 		
-	cout << "here2" << endl;  // TESTING
-	int ID = motor.getID();
+	cout << "here10" << endl;  // TESTING
+	int ID = motorPointer->getID();
 	cout << "ID: " << ID << endl;  // TESTING
 	return NanotecParser::intToString( ID );
 }

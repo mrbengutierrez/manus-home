@@ -20,7 +20,19 @@
  * 
  * does nothing, DO NOT CALL
  */
+ /*
 NanotecMotor::NanotecMotor() {
+}
+*/
+
+NanotecMotor& NanotecMotor::operator=(const NanotecMotor &oldNanotecMotor) {
+	cout << "Nanotec Motor is being assigned. This is not allowed." << endl;
+	throw;
+}
+
+NanotecMotor::NanotecMotor(const NanotecMotor &oldNanotecMotor) {
+	cout << "Nanotec Motor is being copied. This is not allowed." << endl;
+	throw;
 }
 
 
@@ -55,12 +67,11 @@ NanotecMotor::NanotecMotor(const char *serialPort, const int ID)
 
 
 /**
- * Default Constructor.
+ * Default Destructor.
  */
 NanotecMotor::~NanotecMotor()
 {
-  free( _nanotec);
-  
+  delete _nanotec;
 }
 
 /*

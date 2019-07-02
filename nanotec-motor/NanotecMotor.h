@@ -54,9 +54,12 @@ class NanotecMotor
      */
 
     // Basic methods: constructors and set properties.
-    NanotecMotor(); // default constructor, only for initializing containers
+    //NanotecMotor(); // default constructor, only for initializing containers
     NanotecMotor(const char *serialPort, const int ID = 0);
     ~NanotecMotor();
+    NanotecMotor(const NanotecMotor &oldNanotecMotor); // copy constructor
+    NanotecMotor& operator=(const NanotecMotor &oldNanotecMotor); // assignment constructor
+    //NanotecMotor* operator=(const NanotecMotor &oldNanotecMotor);
     
     // method to get the ID number of the motor
     int getID();

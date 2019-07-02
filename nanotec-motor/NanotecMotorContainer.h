@@ -14,7 +14,7 @@
 #include <stdio.h> 
 #include <string.h> 
 #include <stdlib.h> 
-#include <map>     // for function map
+#include <vector>     // for function map
 
 
 #include "NanotecMotor.h"  // for executing functions
@@ -24,15 +24,23 @@ using namespace std;
 class NanotecMotorContainer
 {
 	private: // Variables
-		std::map<std::string, NanotecMotor> _motorMap; // "serial port" : motor_pointer
+	
+		// vectors maintain rep invariant
+		// ideally it would be better to use a map for constant time lookups
+		// however there were issues in getting the NanotecParser to work when
+		// using a map to maintain the rep invariant.
+		std::vector<std::string> _serialPortVector; // "serial port" : motor_pointer
+		std::vector<NanotecMotor> _nanotecMotorVector;
 	
 	public: // Methods
+	
+		NanotecMotorContainer();
 		
-		void insert(std::string serialPort, NanotecMotor motor);
+		void insert(std::string serialPort, NanotecMotor* motor);
 		
 		bool contains(std::string serialPort);
 		
-		NanotecMotor getMotor(std::string serialPort);
+		NanotecMotor* getMotor(std::string serialPort);
 		
 		void removeMotor(std::string serialPort);			
 };
