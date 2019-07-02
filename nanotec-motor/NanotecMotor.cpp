@@ -48,6 +48,9 @@ NanotecMotor::NanotecMotor(const char *serialPort, const int ID)
   
   _ID = ID;
   
+  _serialPort = (char*) malloc(strlen(serialPort) + 1); 
+  strcpy(_serialPort, serialPort);
+  
   // restart port
   stop();
   closePort();
@@ -72,6 +75,7 @@ NanotecMotor::NanotecMotor(const char *serialPort, const int ID)
 NanotecMotor::~NanotecMotor()
 {
   delete _nanotec;
+  delete _serialPort;
 }
 
 /*
@@ -82,6 +86,17 @@ int NanotecMotor::getID() {
 	return _ID;
 }
 
+
+/*
+ * Returns a copy of the serial port of the motor
+ * Make sure to free the memory after use.
+ */
+char* NanotecMotor::getSerialPort() {
+	char* serialPortCopy;
+	serialPortCopy = (char*) malloc(strlen(_serialPort) + 1); 
+    strcpy(serialPortCopy, _serialPort);
+    return serialPortCopy;
+}
 
 
 /**

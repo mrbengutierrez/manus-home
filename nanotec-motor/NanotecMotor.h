@@ -45,6 +45,9 @@ class NanotecMotor
     
     // ID number of the motor
     int _ID;
+    char* getSerialPort();
+    
+    char* _serialPort;
     
     
   public:

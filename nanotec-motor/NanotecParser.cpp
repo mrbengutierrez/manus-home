@@ -57,20 +57,6 @@ char* NanotecParser::stringToCharPointer(std::string stringToConvert) {
 	return stringPointerCopy;
 	
 }
-
-/** Converts a string to a void*
- * 
- * @param stringToConvert string to convert into void*
- */ 
-void* NanotecParser::stringToVoidPointer(std::string stringToConvert) {	
-	
-	// convert address to base 16
-    int hexAddress = stoi(stringToConvert, 0, 16);
-    // make a new pointer 
-    void * voidPointer = (void *) hexAddress;
-    
-    return voidPointer;
-}
 		
 /** Converts a double to a string
  * 
@@ -107,24 +93,6 @@ std::string NanotecParser::charPointerToString(char* charPointerToConvert) {
 	return convertedString;
 }
 
-/** Converts a void* to a string
- * 
- * @param voidPointerToConvert void* to convert into string
- */
-std::string NanotecParser::voidPointerToString(void* voidPointerToConvert) {
-    ostringstream addressStringStream;
-    addressStringStream << voidPointerToConvert;
-    std::string addressString =  addressStringStream.str(); 
-    
-    /*
-    const void * address = static_cast<const void*>(this);
-	std::stringstream ss;
-	ss << address;  
-	std::string name = ss.str(); 
-	*/
-    return addressString;
-}
-// End type conversion functions
 //-----------------------------------------------------------------------------------------------------
 
 
@@ -213,12 +181,12 @@ std::string NanotecParser::nanotecMotor(std::vector<std::string> argumentVector)
 
 	// initialize variables for _motorMap
 	std::string serialPortString = argumentVector.at(1);
-
+/*
 	// make sure motor is not already in use
-	if ( _motorContainer.contains(serialPortString)) { 
+	if ( _motorContainerPointer->contains(serialPortString)) { 
 		cout << "Error: Motor using serial port " << serialPortString << " already exists." << endl;
 		throw;
-	}
+	}*/
 
 	char* serialPort = NanotecParser::stringToCharPointer( argumentVector.at(1) );
 	
@@ -233,11 +201,10 @@ std::string NanotecParser::nanotecMotor(std::vector<std::string> argumentVector)
 		int ID = NanotecParser::stringToInt( argumentVector.at(2) );
 		cout << "here4" << endl;  // TESTING
 		NanotecMotor* motorPointer = new NanotecMotor(serialPort,ID);
+		cout << "motorPointer.getID (initial): " << motorPointer->getID() << endl;  // TESTING
 		cout << "motorPointer (initial): " << motorPointer << endl;  // TESTING
-		//NanotecMotor motor = *motorPointer;
 		cout << "here5" << endl;  // TESTING
-		_motorContainer.insert(serialPort,motorPointer);
-		NanotecMotor* motorPointer2 = _motorContainer.getMotor(serialPort);
+		_motorContainerPointer->insert(serialPort,motorPointer);
 		cout << "here6" << endl;  // TESTING
 		delete serialPort; // free char* memory
 	}
@@ -255,8 +222,7 @@ std::string NanotecParser::getID(std::vector<std::string> argumentVector) {
 	cout << "here8" << endl;  // TESTING
 	std::string serialPort = argumentVector.at(1);
 	cout << "here9" << endl;  // TESTING
-	NanotecMotor* motorPointer = _motorContainer.getMotor(serialPort);
-	//NanotecMotor motor = *motorPointer;
+	NanotecMotor* motorPointer = _motorContainerPointer->getMotor(serialPort);
 	cout << "motorPointer (final): " << motorPointer << endl;  // TESTING
 	
 		
@@ -419,6 +385,7 @@ std::string NanotecParser::execute(std::string stringToExecute) {
  */
 NanotecParser::NanotecParser() {
 	
+	_motorContainerPointer = new NanotecMotorContainer();
 	// initialize the motor map
 	//_motorMap = new map<std::string,NanotecMotor*>();
 	
@@ -467,7 +434,7 @@ int main()
     std::vector<std::string> stringVector;
     std::string delimiter = ",";
     
-    NanotecParser* Parser;
+    NanotecParser* Parser = new NanotecParser();
     
     Parser->execute("printDog,pup,4");
 	sleep(1);

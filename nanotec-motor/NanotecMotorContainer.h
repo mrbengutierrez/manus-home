@@ -20,6 +20,8 @@
 #include "NanotecMotor.h"  // for executing functions
 using namespace std; 
 
+#define maxNumberofMotors 100
+
 
 class NanotecMotorContainer
 {
@@ -30,7 +32,9 @@ class NanotecMotorContainer
 		// however there were issues in getting the NanotecParser to work when
 		// using a map to maintain the rep invariant.
 		std::vector<std::string> _serialPortVector; // "serial port" : motor_pointer
-		std::vector<NanotecMotor> _nanotecMotorVector;
+		NanotecMotor* _nanotecMotorArray[maxNumberofMotors];
+		
+		int _numMotors;
 	
 	public: // Methods
 	

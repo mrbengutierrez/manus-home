@@ -35,7 +35,7 @@ class NanotecParser
 		//std::map<std::string, functionPointer> _functionMap; // "func_name" : func_name
 		
 		// keep track of motors used
-		NanotecMotorContainer _motorContainer; // "serial port" : motor_pointer
+		NanotecMotorContainer* _motorContainerPointer; // "serial port" : motor_pointer
 		
 	
 	private: // Methods
@@ -51,13 +51,11 @@ class NanotecParser
 		static double stringToDouble(std::string stringToConvert);
 		static int stringToInt(std::string stringToConvert);
 		static char* stringToCharPointer(std::string stringToConvert);
-		static void* stringToVoidPointer(std::string stringToConvert);
 		
 		// type to string conversion functions
 		static std::string  doubleToString(double doubleToConvert);
 		static std::string intToString(int intToConvert);
 		static std::string charPointerToString(char* charPointerToConvert);
-		static std::string voidPointerToString(void* voidPointerToConvert);
 		
 		//Methods to interface with NanotecMotor.h
 		
