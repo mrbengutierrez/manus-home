@@ -7,7 +7,7 @@ Full partition tests are not done. Only typical use cases are tested.
 
 sleepTime = 5
 
-from NanotecLibrary import NanotecMotor
+#from NanotecLibrary import NanotecMotor
 import time
 
 def printMotorsInformation(motors):

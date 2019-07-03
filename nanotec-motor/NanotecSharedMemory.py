@@ -82,6 +82,7 @@ class NanotecSharedMemoryClient:
 		returnString = NanotecSharedMemoryClient.readMemory(self.dataMemory)
 		return returnString
 		
+	
 		
 	
 		
@@ -112,12 +113,29 @@ def testNanotecSharedMemory():
 	startTime = time.time()
 	numCalls = 1000
 	for _ in range(numCalls):
-		ID1 = memoryClient.sendInstruction("getID," + serialPort1)
+		ID1 = memoryClient.sendInstruction("getSerialPort," + serialPort1)
 	endTime = time.time()
-	print("total time: " + str(endTime-startTime))
-	print("ID1 (actual): " + ID1 + ", expected: 17")
-	return
+	totalTime = endTime - startTime
+	print("")
+	print("ID Call")
+	print("numCalls: " + str(numCalls))
+	print("total time: " + str(totalTime))
+	print("time per call: " + str(totalTime/numCalls))
 	
+	
+	startTime = time.time()
+	numCalls = 1000
+	for _ in range(numCalls):
+		position = memoryClient.sendInstruction("getAbsoluteAngularPosition," + serialPort1)
+	endTime = time.time()
+	totalTime = endTime - startTime
+	print("")
+	print("Position Call")
+	print("numCalls: " + str(numCalls))
+	print("total time: " + str(totalTime))
+	print("time per call: " + str(totalTime/numCalls))
+	
+	return
 
 
 def main():

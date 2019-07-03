@@ -19,6 +19,11 @@ extern "C"
 	{
 		return motor->getID();
 	}
+	// method to get the serial port of the motor
+	char* NanotecMotor_getSerialPort( NanotecMotor* motor) 
+	{
+		return motor->getSerialPort();
+	}
 	
 	// Modes of Operation
 	void NanotecMotor_torqueMode(NanotecMotor* motor, int torque, int maxTorque, int maxCurr, int nomCurr, int slope)
