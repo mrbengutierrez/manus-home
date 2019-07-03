@@ -169,8 +169,9 @@ std::string NanotecParser::nanotecMotor(std::vector<std::string> argumentVector)
 	std::string serialPortString = argumentVector.at(1);
 	
 	if ( _motorContainerPointer->contains(serialPortString) == true ) {
-		cout << "NanotecParser Error: Motor using serial port " << serialPortString << " already exists " << endl;
-		throw;
+		//cout << "NanotecParser Error: Motor using serial port " << serialPortString << " already exists " << endl;
+		//throw;
+		_motorContainerPointer->removeMotor(serialPortString);
 	}
 
 	char* serialPort = NanotecParser::stringToCharPointer( argumentVector.at(1) );
@@ -639,11 +640,9 @@ void printMotorsInformation(NanotecParser* Parser, std::vector<std::string> seri
 }
 
 
-/**
- * Main function performs tests to test parser. Requires a nanotec motor to be connected.
- * 
- * 
- */
+
+
+// Main function performs tests to test parser. Requires a nanotec motor to be connected.
 int main() 
 {
     std::string instruction;

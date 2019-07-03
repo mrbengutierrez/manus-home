@@ -20,7 +20,11 @@
 
 #include "NanotecMotor.h"  // for executing functions
 #include "SharedMemory.h"  // include shared memory objects
+#include "NanotecParser.h" // for parsing instructions
 using namespace std; 
+
+#define DATA_KEY 65;
+#define STATUS_KEY 88;
 
 
 
@@ -28,19 +32,27 @@ class NanotecSharedMemory
 {
 	private: // Variables
 		
-		// Pointer to the shared memory location
+		// Pointers to the shared memory location
+		
+		/**
+		 * _dataSharedMemory manages the data that is transferred between functions.
+		 * clients can send commands to be executed, and servers can send return values back
+		 * 
+		 */
 		SharedMemory * _dataSharedMemory;
+		
+		/**
+		 * _statusSharedMemory manages the status of memory transfer
+		 * clients write "start" when they have written to the data memory
+		 * servers write "end" when they have executed the instruction and written to data memory
+		 */
 		SharedMemory * _statusSharedMemory;
 		
+		// Parses string instructions that are sent in data register.
+		NanotecParser* _Parser;
 	
 	private: // Methods
 		
-		static int countDelimiters(char delimiter, char* sequence, int sequenceLength);
-		
-		static std::vector<std::string> splitString(std::string stringToSplit, std::string delimiter);
-		
-		// execute parsed input from memory
-		bool callFunctionUsingVector(std::vector<std::string> splittedStringVector);
 		
 		
 		
@@ -60,6 +72,8 @@ class NanotecSharedMemory
 		
 		// execute instruction at memory location
 		bool executeMemory();
+		
+		void start();
 	
 };
 

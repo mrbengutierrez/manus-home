@@ -17,5 +17,10 @@ This repository contains the newer version python rehabilitation games.
 * sudo apt-get install python3-pyqt5   # for python3
 * sudo apt-get install python-pyqt5    # for python2
 * sudo apt-get install libopencv-dev python3-opencv
+* sudo apt-get install python-dev   # for sysv_ipc install
+* sudo apt-get install python3-dev # for sysv_ipc install
+  * Note: also have to install sysv_ipc located in nanotec-motor folder using:
+  * sudo python setup.py install
+
 
 
