@@ -411,6 +411,210 @@ class NanotecWrapper(NanotecMotorAbstract):
 	
 	
 		
+
+
+
+
+
+
+
+
+
+
+
+
+import sysv_ipc # shared memory module
+import time
+
+#--------------------------------------------------------------------------------------------------------------------------------------
+'''
+NanotecSharedMemoryClient
+
+The NanotecSharedMemory class directly communicates between NanotecMotor.h using shared memory
+
+Author: Benjamin Gutierrez
+Date: 07/03/2019
+'''
+
+
+class NanotecSharedMemoryClient(NanotecMotorAbstract):
+	
+	def __init__(self):
+		"""Initializes the status and data memory"""
+		self.dataMemory = sysv_ipc.SharedMemory(65)
+		self.statusMemory = sysv_ipc.SharedMemory(88)
+		self.serialPort = "SERIAL PORT NOT INITIALIZED"
+		return
+	
+	@staticmethod
+	def readMemory(memory): # static method
+		"""Reads a shared memory location
+		
+		Parameters:
+		memory (sysv_ipc.SharedMemory): shared memory object
+		
+		Returns:
+		(string): string representation of the data in the shared memory location
+		"""
+		# Read value from shared memory
+		memoryValue = memory.read()
+		# Find the 'end' of the string and strip
+		i = memoryValue.find(ord('\0'))
+		if i != -1:
+			memoryValue = memoryValue[:i]
+		else:
+			errorMessage = "i: " + str(i) + " should be -1 to have read \0 in memory location"
+			raise ValueError(errorMessage)
+		return str(memoryValue.decode('ascii'))
+	
+	@staticmethod
+	def writeMemory(memory,message): # static method
+		"""Writes to a shared memory location
+		
+		Parameters:
+		memory (sysv_ipc.SharedMemory): shared memory object
+		message (string): message to write to shared memory
+		
+		Returns:
+		None
+		"""
+		message += chr(0)
+		bytesMessage = message.encode('ascii')
+		memory.write(bytesMessage)
+		return
+		
+	def sendInstruction(self,instruction):
+		"""Sends an instruction using shared memory
+		
+			Parameters:
+			instruction (string): instruction to be sent
+									Format: "function_name,arg1,arg2,..." 
+  									If "function_name" represents an instance of a nanotec motor, 
+									"arg1" must be the serial port of that motor
+			
+			Return:
+			(string): string representation of return value from the corresponding function in NanotecMotor
+		"""
+		startMessage = "start"
+		endMessage = "end"
+		
+		NanotecSharedMemoryClient.writeMemory(self.dataMemory,instruction)
+		NanotecSharedMemoryClient.writeMemory(self.statusMemory,startMessage)
+		
+		# wait for instruction to be executed
+		currentStatus = NanotecSharedMemoryClient.readMemory(self.statusMemory)
+		while ( currentStatus != endMessage):
+			currentStatus = NanotecSharedMemoryClient.readMemory(self.statusMemory)
+
+		returnString = NanotecSharedMemoryClient.readMemory(self.dataMemory)
+		return returnString
+		
+	@staticmethod
+	def argumentsToString(listOfArguments,delimiter = ","):
+		argumentString = ""
+		for i in range(listOfArguments):
+			if i == 0: # don't add delimiter to first arguments
+				argumentString += str(listOfArguments[i])
+			else:
+				argumentString += delimiter + str(listOfArguments[i])
+		return argumentString
+				
+			
+
+	def getID(self):
+		instruction = NanotecSharedMemoryClient.argumentsToString(["getID",self.serialPort])
+		result = self.sendInstruction(instruction)
+		return int(result)
+		
+	def getSerialPort(self):
+		instruction = NanotecSharedMemoryClient.argumentsToString(["getSerialPort",self.serialPort])
+		result = self.sendInstruction(instruction)
+		return str(result)
+		
+	def torqueMode(self,torque = 0, maxTorque = 1000, maxCurr = 1800, nomCurr = 1800, slope = 1000):
+		instruction = NanotecSharedMemoryClient.argumentsToString(["torqueMode",self.serialPort,torque,maxTorque,maxCurr,nomCurr,slope])
+		result = self.sendInstruction(instruction)
+		return None
+		
+	def angularVelocityMode(self,angVel = 0):
+		instruction = NanotecSharedMemoryClient.argumentsToString(["angularVelocityMode",self.serialPort,angVel])
+		result = self.sendInstruction(instruction)
+		return None
+		
+	def angularPositionMode(self, angPos = 0.0, angVel = 200):
+		instruction = NanotecSharedMemoryClient.argumentsToString(["angularPositionMode",self.serialPort,angPos,angVel])
+		result = self.sendInstruction(instruction)
+		return None
+	
+	def setTorque(self, torque):
+		instruction = NanotecSharedMemoryClient.argumentsToString(["setTorque",self.serialPort,torque])
+		result = self.sendInstruction(instruction)
+		return None
+	
+	def setAngularVelocity(self, angVel):
+		instruction = NanotecSharedMemoryClient.argumentsToString(["setAngularVelocity",self.serialPort,angVel])
+		result = self.sendInstruction(instruction)
+		return None
+	
+	def setRelativeAngularPosition(self, angPos, angVel = 200):
+		instruction = NanotecSharedMemoryClient.argumentsToString(["setRelativeAngularPosition",self.serialPort,angPos,angVel])
+		result = self.sendInstruction(instruction)
+		return None
+		
+	def setAbsoluteAngularPosition(self, angPos, angVel = 200):
+		instruction = NanotecSharedMemoryClient.argumentsToString(["setAbsoluteAngularPosition",self.serialPort,angPos,angVel])
+		result = self.sendInstruction(instruction)
+		return None
+	
+	def setAbsoluteAngularPositionShortestPath(self, angPos,angVel = 200):
+		instruction = NanotecSharedMemoryClient.argumentsToString(["setAbsoluteAngularPositionShortestPath",self.serialPort,angPos,angVel])
+		result = self.sendInstruction(instruction)
+		return None
+	
+	def stop(self):
+		instruction = NanotecSharedMemoryClient.argumentsToString(["stop",self.serialPort])
+		result = self.sendInstruction(instruction)
+		return None
+	
+	def getTorque(self):
+		instruction = NanotecSharedMemoryClient.argumentsToString(["getTorque",self.serialPort])
+		result = self.sendInstruction(instruction)
+		return int(result)
+	
+	def getAngularVelocity(self):
+		instruction = NanotecSharedMemoryClient.argumentsToString(["getAngularVelocity",self.serialPort])
+		result = self.sendInstruction(instruction)
+		return int(result)
+	
+	def getAbsoluteAngularPosition(self):
+		instruction = NanotecSharedMemoryClient.argumentsToString(["getAbsoluteAngularPosition",self.serialPort])
+		result = self.sendInstruction(instruction)
+		return float(result)
+				
+	def readPhysicalEncoder(self):
+		rinstruction = NanotecSharedMemoryClient.argumentsToString(["readPhysicalEncoder",self.serialPort])
+		result = self.sendInstruction(instruction)
+		return int(result)
+	
+	def closePort(self):
+		instruction = NanotecSharedMemoryClient.argumentsToString(["closePort",self.serialPort])
+		result = self.sendInstruction(instruction)
+		return float(result)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		
 
 
