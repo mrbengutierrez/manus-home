@@ -7,7 +7,13 @@ Full partition tests are not done. Only typical use cases are tested.
 
 sleepTime = 5
 
-#from NanotecLibrary import NanotecMotor
+import sys
+# Add the ptdraft folder path to the sys.path list
+sys.path.append('../')
+
+from NanotecLibrary import NanotecWrapper as NanotecMotor
+
+
 import time
 
 def printMotorsInformation(motors):

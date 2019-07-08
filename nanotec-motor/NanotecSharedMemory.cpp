@@ -95,6 +95,12 @@ void NanotecSharedMemory::start() {
 	
 	// infinite loop to execute instruction over and over again.
 	while(true) {
+		/* Print out for debugging.
+		cout << endl;
+		cout << "_dataSharedMemory: " << _dataSharedMemory->readMemory() << endl; 
+		cout << "_statusSharedMemory: " << _statusSharedMemory->readMemory() << endl;
+		*/ 
+		
 		std::string statusString = _statusSharedMemory->readMemory(); // read status memory
 		
 		// if status string is equal to start message, execute instruction

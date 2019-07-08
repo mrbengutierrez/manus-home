@@ -260,7 +260,7 @@ ctypes.byref(...) 									& 			pass by reference (suitable for arguments return
 import ctypes # Python standard library for managing Python to c interfacing
 
 # Shared C Library for the NanotecMotor.cpp
-sharedCLibrary = ctypes.cdll.LoadLibrary('./NanotecMotor.so')
+sharedCLibrary = ctypes.cdll.LoadLibrary('../NanotecMotor.so')
 
 
 class NanotecWrapper(NanotecMotorAbstract):
@@ -439,11 +439,13 @@ Date: 07/03/2019
 
 class NanotecSharedMemoryClient(NanotecMotorAbstract):
 	
-	def __init__(self):
+	def __init__(self,serialPort,ID = 0):
 		"""Initializes the status and data memory"""
 		self.dataMemory = sysv_ipc.SharedMemory(65)
 		self.statusMemory = sysv_ipc.SharedMemory(88)
-		self.serialPort = "SERIAL PORT NOT INITIALIZED"
+		
+		instruction = NanotecSharedMemoryClient.argumentsToString(["NanotecMotor",serialPort,ID])
+		self.serialPort = self.sendInstruction(instruction)
 		return
 	
 	@staticmethod
@@ -498,6 +500,10 @@ class NanotecSharedMemoryClient(NanotecMotorAbstract):
 		startMessage = "start"
 		endMessage = "end"
 		
+		# make sure no other NanotecSharedMemoryClients are writing to memory
+		while(NanotecSharedMemoryClient.readMemory(self.statusMemory) == startMessage ):
+			pass
+		
 		NanotecSharedMemoryClient.writeMemory(self.dataMemory,instruction)
 		NanotecSharedMemoryClient.writeMemory(self.statusMemory,startMessage)
 		
@@ -512,7 +518,7 @@ class NanotecSharedMemoryClient(NanotecMotorAbstract):
 	@staticmethod
 	def argumentsToString(listOfArguments,delimiter = ","):
 		argumentString = ""
-		for i in range(listOfArguments):
+		for i in range(len(listOfArguments)):
 			if i == 0: # don't add delimiter to first arguments
 				argumentString += str(listOfArguments[i])
 			else:
@@ -592,20 +598,45 @@ class NanotecSharedMemoryClient(NanotecMotorAbstract):
 		return float(result)
 				
 	def readPhysicalEncoder(self):
-		rinstruction = NanotecSharedMemoryClient.argumentsToString(["readPhysicalEncoder",self.serialPort])
+		instruction = NanotecSharedMemoryClient.argumentsToString(["readPhysicalEncoder",self.serialPort])
 		result = self.sendInstruction(instruction)
 		return int(result)
 	
 	def closePort(self):
 		instruction = NanotecSharedMemoryClient.argumentsToString(["closePort",self.serialPort])
 		result = self.sendInstruction(instruction)
-		return float(result)
+		return None
 
 
 
 
 
 
+import subprocess
+import sys
+
+class NanotecSharedMemoryServer:
+	
+	def __init__(self):
+		self.serverProcess = "SHARED MEMORY SERVER NOT INITIALIZED"
+	
+	def startServer(self):
+		return
+		"""Starts a new nanotec shared memory server in a new process"""
+		# "exec " This will cause cmd to inherit the shell process, 
+		# instead of having the shell launch a child process, 
+		# which does not get killed. self.serverProcess.pid will be the id of your cmd process then.
+		#self.serverProcess = subprocess.Popen("sudo ./../NanotecSharedMemory", shell=True)
+		self.serverProcess = subprocess.Popen(["../NanotecSharedMemory"])
+		serverDelay = 5 # seconds
+		time.sleep(serverDelay) # Delay before starting the Server,
+		              # If delay is not present, server could be started after
+		              # client sends a message causing an error
+		print("nanotec shared memory server started")
+		
+	def closeServer(self):
+		"""closes the nanotec shared memory server process"""
+		self.serverProcess.kill()
 
 
 
