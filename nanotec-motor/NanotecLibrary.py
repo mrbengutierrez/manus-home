@@ -428,62 +428,18 @@ import time
 
 #--------------------------------------------------------------------------------------------------------------------------------------
 '''
-NanotecSharedMemoryClient
+NanotecServer
 
-The NanotecSharedMemory class directly communicates between NanotecMotor.h using shared memory
+The NanotecServer class directly communicates between NanotecMotor.h using a port
 
 Author: Benjamin Gutierrez
-Date: 07/03/2019
+Date: 07/08/2019
 '''
 
-
-class NanotecSharedMemoryClient(NanotecMotorAbstract):
-	
+class NanotecClient(NanotecMotorAbstract):
 	def __init__(self,serialPort,ID = 0):
-		"""Initializes the status and data memory"""
-		self.dataMemory = sysv_ipc.SharedMemory(65)
-		self.statusMemory = sysv_ipc.SharedMemory(88)
-		
-		instruction = NanotecSharedMemoryClient.argumentsToString(["NanotecMotor",serialPort,ID])
-		self.serialPort = self.sendInstruction(instruction)
-		return
-	
-	@staticmethod
-	def readMemory(memory): # static method
-		"""Reads a shared memory location
-		
-		Parameters:
-		memory (sysv_ipc.SharedMemory): shared memory object
-		
-		Returns:
-		(string): string representation of the data in the shared memory location
-		"""
-		# Read value from shared memory
-		memoryValue = memory.read()
-		# Find the 'end' of the string and strip
-		i = memoryValue.find(ord('\0'))
-		if i != -1:
-			memoryValue = memoryValue[:i]
-		else:
-			errorMessage = "i: " + str(i) + " should be -1 to have read \0 in memory location"
-			raise ValueError(errorMessage)
-		return str(memoryValue.decode('ascii'))
-	
-	@staticmethod
-	def writeMemory(memory,message): # static method
-		"""Writes to a shared memory location
-		
-		Parameters:
-		memory (sysv_ipc.SharedMemory): shared memory object
-		message (string): message to write to shared memory
-		
-		Returns:
-		None
-		"""
-		message += chr(0)
-		bytesMessage = message.encode('ascii')
-		memory.write(bytesMessage)
-		return
+		"""Initializes the client"""
+		raise NotImplementedError
 		
 	def sendInstruction(self,instruction):
 		"""Sends an instruction using shared memory
@@ -497,23 +453,7 @@ class NanotecSharedMemoryClient(NanotecMotorAbstract):
 			Return:
 			(string): string representation of return value from the corresponding function in NanotecMotor
 		"""
-		startMessage = "start"
-		endMessage = "end"
-		
-		# make sure no other NanotecSharedMemoryClients are writing to memory
-		while(NanotecSharedMemoryClient.readMemory(self.statusMemory) == startMessage ):
-			pass
-		
-		NanotecSharedMemoryClient.writeMemory(self.dataMemory,instruction)
-		NanotecSharedMemoryClient.writeMemory(self.statusMemory,startMessage)
-		
-		# wait for instruction to be executed
-		currentStatus = NanotecSharedMemoryClient.readMemory(self.statusMemory)
-		while ( currentStatus != endMessage):
-			currentStatus = NanotecSharedMemoryClient.readMemory(self.statusMemory)
-
-		returnString = NanotecSharedMemoryClient.readMemory(self.dataMemory)
-		return returnString
+		raise NotImplementedError
 		
 	@staticmethod
 	def argumentsToString(listOfArguments,delimiter = ","):
@@ -523,9 +463,7 @@ class NanotecSharedMemoryClient(NanotecMotorAbstract):
 				argumentString += str(listOfArguments[i])
 			else:
 				argumentString += delimiter + str(listOfArguments[i])
-		return argumentString
-				
-			
+		return argumentString	
 
 	def getID(self):
 		instruction = NanotecSharedMemoryClient.argumentsToString(["getID",self.serialPort])
@@ -606,6 +544,110 @@ class NanotecSharedMemoryClient(NanotecMotorAbstract):
 		instruction = NanotecSharedMemoryClient.argumentsToString(["closePort",self.serialPort])
 		result = self.sendInstruction(instruction)
 		return None
+
+
+
+
+
+
+
+
+
+
+
+'''
+NanotecSharedMemoryClient
+
+The NanotecSharedMemory class directly communicates between NanotecMotor.h using shared memory
+
+Author: Benjamin Gutierrez
+Date: 07/03/2019
+'''
+
+
+class NanotecSharedMemoryClient(NanotecClient):
+	
+	def __init__(self,serialPort,ID = 0):
+		"""Initializes the status and data memory"""
+		self.dataMemory = sysv_ipc.SharedMemory(65)
+		self.statusMemory = sysv_ipc.SharedMemory(88)
+		
+		instruction = NanotecSharedMemoryClient.argumentsToString(["NanotecMotor",serialPort,ID])
+		self.serialPort = self.sendInstruction(instruction)
+		return
+	
+	@staticmethod
+	def readMemory(memory): # static method
+		"""Reads a shared memory location
+		
+		Parameters:
+		memory (sysv_ipc.SharedMemory): shared memory object
+		
+		Returns:
+		(string): string representation of the data in the shared memory location
+		"""
+		# Read value from shared memory
+		memoryValue = memory.read()
+		# Find the 'end' of the string and strip
+		i = memoryValue.find(ord('\0'))
+		if i != -1:
+			memoryValue = memoryValue[:i]
+		else:
+			errorMessage = "i: " + str(i) + " should be -1 to have read \0 in memory location"
+			raise ValueError(errorMessage)
+		return str(memoryValue.decode('ascii'))
+	
+	@staticmethod
+	def writeMemory(memory,message): # static method
+		"""Writes to a shared memory location
+		
+		Parameters:
+		memory (sysv_ipc.SharedMemory): shared memory object
+		message (string): message to write to shared memory
+		
+		Returns:
+		None
+		"""
+		message += chr(0)
+		bytesMessage = message.encode('ascii')
+		memory.write(bytesMessage)
+		return
+		
+	def sendInstruction(self,instruction):
+		"""Sends an instruction using shared memory
+		
+			Parameters:
+			instruction (string): instruction to be sent
+									Format: "function_name,arg1,arg2,..." 
+  									If "function_name" represents an instance of a nanotec motor, 
+									"arg1" must be the serial port of that motor
+			
+			Return:
+			(string): string representation of return value from the corresponding function in NanotecMotor
+		"""
+		startMessage = "start"
+		endMessage = "end"
+		
+		# make sure no other NanotecSharedMemoryClients are writing to memory
+		while(NanotecSharedMemoryClient.readMemory(self.statusMemory) == startMessage ):
+			pass
+		
+		NanotecSharedMemoryClient.writeMemory(self.dataMemory,instruction)
+		NanotecSharedMemoryClient.writeMemory(self.statusMemory,startMessage)
+		
+		# wait for instruction to be executed
+		currentStatus = NanotecSharedMemoryClient.readMemory(self.statusMemory)
+		while ( currentStatus != endMessage):
+			currentStatus = NanotecSharedMemoryClient.readMemory(self.statusMemory)
+
+		returnString = NanotecSharedMemoryClient.readMemory(self.dataMemory)
+		return returnString
+		
+		
+		
+		
+		
+			
 
 
 

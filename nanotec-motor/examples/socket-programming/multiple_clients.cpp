@@ -1,10 +1,3 @@
-/**
- * This cpp file is definitions of the netword interface for the NanotecNetworkServer.h
- * 
- * @author Benjamin Gutierrez (bengutie@mit.edu)
- * @date July 8, 2019
- * 
- */
 
 //Example code: A simple server side code, which echos back the received message. 
 //Handle multiple socket connections with select and fd_set on Linux  
@@ -21,7 +14,6 @@
 
 
 #include <iostream> // for std::string, std::string will not work without this include
-#include "NanotecParser.h" // For parsing instructions
 
 using namespace std;
 
@@ -33,8 +25,6 @@ using namespace std;
      
 int main(int argc , char *argv[])   
 {   
-	NanotecParser* Parser = new NanotecParser();
-	
     int opt = TRUE;   
     int master_socket , addrlen , new_socket , client_socket[30] ,  
           max_clients = 30 , activity, i , valread , sd;   
@@ -195,9 +185,7 @@ int main(int argc , char *argv[])
                     std::string messageReceived(buffer);
                     cout << "Message Received: " << messageReceived << endl;
                     
-                    
-                    
-                    std::string returnMessageString = Parser->execute(messageReceived);
+                    std::string returnMessageString = "Server say hi\n";
                     // assigning value to string s 
   
 					int n = returnMessageString.length(); 
@@ -212,7 +200,7 @@ int main(int argc , char *argv[])
                     cout << "Sending Back: " << returnMessageCharArray << endl;
                     
                     send(sd , returnMessageCharArray , strlen(returnMessageCharArray) , 0 );  
-                    
+                    //free(returnMessageCharArray); // free char array memory
                 }   
             }   
         }   
