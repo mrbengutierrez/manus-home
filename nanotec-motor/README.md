@@ -62,7 +62,7 @@ Processor: Intel(R) Core(TM) i7-3840QM 2.8GHz
 | setAbsoluteAngularPosition              | 49 ms          | 49 ms               | 49 ms          |
 | setAbsoluteAngularPositionShortestPath  | 49 ms          | 49 ms               | 49 ms          |
 | stop                                    | 6 ms           | 6 ms                | 6 ms           |
-| getTorque                               | 3 ms           | 3 ms                | 6 ms           |
+| getTorque                               | 6 ms           | 6 ms                | 6 ms           |
 | getAngularVelocity                      | 3 ms           | 3 ms                | 3 ms           |
 | getAbsoluteAngularPosition              | 3 ms           | 3 ms                | 3 ms           |
 | readPhysicalEncoder                     | 3 ms           | 3 ms                | 3 ms           |

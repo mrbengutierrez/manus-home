@@ -11,7 +11,7 @@ import sys
 # Add the ptdraft folder path to the sys.path list
 sys.path.append('../')
 
-from NanotecLibrary import NanotecWrapper as NanotecMotor
+from NanotecLibrary import NanotecNetworkClient as NanotecMotor
 #from NanotecLibrary import NanotecSharedMemoryServer as NanotecServer
 
 import time
