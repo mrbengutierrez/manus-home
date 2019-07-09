@@ -134,6 +134,7 @@ void CommunicationNT::initializeSerial(const char *serialPort)
     closePort();
     exit(0);
   }
+  
 }
 
 

@@ -1,6 +1,8 @@
 /**
  * This cpp file is definitions of the netword interface for the NanotecNetworkServer.h
  * 
+ * Based off of: https://www.geeksforgeeks.org/socket-programming-in-cc-handling-multiple-clients-on-server-without-multi-threading/
+ * 
  * @author Benjamin Gutierrez (bengutie@mit.edu)
  * @date July 8, 2019
  * 
@@ -142,6 +144,7 @@ int main(int argc , char *argv[])
             //inform user of socket number - used in send and receive commands  
             printf("New connection , socket fd is %d , ip is : %s , port : %d  \n" , new_socket , inet_ntoa(address.sin_addr) , ntohs (address.sin_port));   
            
+           /* Don't send greeting message
             //send new connection greeting message  
             if( send(new_socket, message, strlen(message), 0) != strlen(message) )   
             {   
@@ -149,6 +152,7 @@ int main(int argc , char *argv[])
             }   
                  
             puts("Welcome message sent successfully");   
+            */
                  
             //add new socket to array of sockets  
             for (i = 0; i < max_clients; i++)   
@@ -193,7 +197,7 @@ int main(int argc , char *argv[])
                     buffer[valread] = '\0';   
                     
                     std::string messageReceived(buffer);
-                    cout << "Message Received: " << messageReceived << endl;
+                    // cout << "Message Received: " << messageReceived << endl; // For debugging
                     
                     
                     
@@ -201,6 +205,12 @@ int main(int argc , char *argv[])
                     // assigning value to string s 
   
 					int n = returnMessageString.length(); 
+					
+					// if return string is empty, set return string to NONE
+					if (n==0) {
+						returnMessageString = "NONE";
+						n = returnMessageString.length();
+					}
   
 					// declaring character array 
 					char returnMessageCharArray[n + 1]; 
@@ -209,7 +219,7 @@ int main(int argc , char *argv[])
 					// copying the contents of the 
 					// string to char array 
 					strcpy(returnMessageCharArray, returnMessageString.c_str()); 
-                    cout << "Sending Back: " << returnMessageCharArray << endl;
+                    //cout << "Sending Back: " << returnMessageCharArray << endl; // For debugging
                     
                     send(sd , returnMessageCharArray , strlen(returnMessageCharArray) , 0 );  
                     

@@ -45,6 +45,33 @@ The purpose of this repository is to control multiple nanotec motors. The type o
   * Python file to test if NanotecLibrary.py is working properly
 
 
+#### Speed Tests
+
+Date Conducted: July 8, 2019
+Number of function calls: 100
+Processor: Intel(R) Core(TM) i7-3840QM 2.8GHz 
+
+
+| Function Name                           | NanotecWrapper | NanotecSharedMemory | NanotecNetwork |
+| --------------------------------------- | -------------- | ------------------- | -------------- |
+| getID                                   | 0.5 us         | 12 us               | 27 us          |
+| getSerialPort                           | 0.8 us         | 11 us               | 24 us          |
+| setTorque                               | 3 ms           | 3 ms                | 3 ms           |
+| setAngularVelocity                      | 24 ms          | 24 ms               | 24 ms          |
+| setRelativeAngularPosition              | 46 ms          | 46 ms               | 46 ms          |
+| setAbsoluteAngularPosition              | 49 ms          | 49 ms               | 49 ms          |
+| setAbsoluteAngularPositionShortestPath  | 49 ms          | 49 ms               | 49 ms          |
+| stop                                    | 6 ms           | 6 ms                | 6 ms           |
+| getTorque                               | 3 ms           | 3 ms                | 6 ms           |
+| getAngularVelocity                      | 3 ms           | 3 ms                | 3 ms           |
+| getAbsoluteAngularPosition              | 3 ms           | 3 ms                | 3 ms           |
+| readPhysicalEncoder                     | 3 ms           | 3 ms                | 3 ms           |
+
+
+
+
+
+
 
 #### Updates by Benjamin Gutierrez
 v1.6 12/June/19 

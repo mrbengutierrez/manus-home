@@ -423,14 +423,13 @@ class NanotecWrapper(NanotecMotorAbstract):
 
 
 
-import sysv_ipc # shared memory module
-import time
+
 
 #--------------------------------------------------------------------------------------------------------------------------------------
 '''
-NanotecServer
+NanotecClient
 
-The NanotecServer class directly communicates between NanotecMotor.h using a port
+The NanotecClient class provides the parsing functionality to other clients
 
 Author: Benjamin Gutierrez
 Date: 07/08/2019
@@ -552,19 +551,16 @@ class NanotecClient(NanotecMotorAbstract):
 
 
 
-
-
-
+#--------------------------------------------------------------------------------------------------------------------------------------
 '''
 NanotecSharedMemoryClient
-
 The NanotecSharedMemory class directly communicates between NanotecMotor.h using shared memory
-
 Author: Benjamin Gutierrez
 Date: 07/03/2019
 '''
 
-
+import sysv_ipc # shared memory module
+import time
 class NanotecSharedMemoryClient(NanotecClient):
 	
 	def __init__(self,serialPort,ID = 0):
@@ -614,17 +610,6 @@ class NanotecSharedMemoryClient(NanotecClient):
 		return
 		
 	def sendInstruction(self,instruction):
-		"""Sends an instruction using shared memory
-		
-			Parameters:
-			instruction (string): instruction to be sent
-									Format: "function_name,arg1,arg2,..." 
-  									If "function_name" represents an instance of a nanotec motor, 
-									"arg1" must be the serial port of that motor
-			
-			Return:
-			(string): string representation of return value from the corresponding function in NanotecMotor
-		"""
 		startMessage = "start"
 		endMessage = "end"
 		
@@ -642,6 +627,73 @@ class NanotecSharedMemoryClient(NanotecClient):
 
 		returnString = NanotecSharedMemoryClient.readMemory(self.dataMemory)
 		return returnString
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#--------------------------------------------------------------------------------------------------------------------------------------
+'''
+NanotecNetworkClient
+
+The NanotecNetworkClient class communicates between NanotecMotor.h using a port
+
+Author: Benjamin Gutierrez
+Date: 07/08/2019
+'''
+
+import socket
+
+
+class NanotecNetworkClient(NanotecClient):
+	
+	def __init__(self,serialPort,ID = 0):
+		"""Initializes the port and a new nanotec motor"""
+		host = '127.0.0.1'  # The server's hostname or IP address
+		port = 8888        # The port used by the server
+		
+		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # create new socket object using TCP protocol
+		
+		self.socket.connect((host,port)) # connect to server
+			
+		
+		instruction = NanotecSharedMemoryClient.argumentsToString(["NanotecMotor",serialPort,ID])
+		self.serialPort = self.sendInstruction(instruction)
+		return
+	
+
+	
+		
+	def sendInstruction(self,instruction):
+		instruction += chr(0) # '\0' represents end of string in char array for c++
+		bytesInstruction = instruction.encode('ascii')
+		self.socket.sendall(bytesInstruction)
+		
+		result = self.socket.recv(1024)
+		resultString = result.decode('ascii')
+		#print("resultString: " + resultString) # for debugging
+		return resultString
+
 		
 		
 		
@@ -651,34 +703,6 @@ class NanotecSharedMemoryClient(NanotecClient):
 
 
 
-
-
-
-import subprocess
-import sys
-
-class NanotecSharedMemoryServer:
-	
-	def __init__(self):
-		self.serverProcess = "SHARED MEMORY SERVER NOT INITIALIZED"
-	
-	def startServer(self):
-		return
-		"""Starts a new nanotec shared memory server in a new process"""
-		# "exec " This will cause cmd to inherit the shell process, 
-		# instead of having the shell launch a child process, 
-		# which does not get killed. self.serverProcess.pid will be the id of your cmd process then.
-		#self.serverProcess = subprocess.Popen("sudo ./../NanotecSharedMemory", shell=True)
-		self.serverProcess = subprocess.Popen(["../NanotecSharedMemory"])
-		serverDelay = 5 # seconds
-		time.sleep(serverDelay) # Delay before starting the Server,
-		              # If delay is not present, server could be started after
-		              # client sends a message causing an error
-		print("nanotec shared memory server started")
-		
-	def closeServer(self):
-		"""closes the nanotec shared memory server process"""
-		self.serverProcess.kill()
 
 
 
