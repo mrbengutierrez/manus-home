@@ -47,9 +47,9 @@ The purpose of this repository is to control multiple nanotec motors. The type o
 
 #### Speed Tests
 
-Date Conducted: July 8, 2019
-Number of function calls: 100
-Processor: Intel(R) Core(TM) i7-3840QM 2.8GHz 
+Date Conducted: July 8, 2019  
+Number of function calls: 100  
+Processor: Intel(R) Core(TM) i7-3840QM 2.8GHz   
 
 
 | Function Name                           | NanotecWrapper | NanotecSharedMemory | NanotecNetwork |
