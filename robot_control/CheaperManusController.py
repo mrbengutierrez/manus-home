@@ -192,9 +192,25 @@ class ArmController:
 		# TODO
 		return (0,0)      
 
-	def movePosition(x,y):
-		"""moves robot arm simulator to position"""
-		pass
+	def setPosition(self,x,y,speed=10):
+		"""moves robot arm simulator to position
+		
+		Parameters:
+		x (float): x end effector position in meters
+		y (float): y end effector position in meters
+		speed (float): speed for actuators to move in rpm (This will be changed later)
+		
+		Returns:
+		None
+		"""
+		jointAngles = self.inverseKinematics(x,y)
+		
+		radiansToDegrees = 180.0 / np.pi
+		leftAngleInDegrees = jointAngles[0] * radiansToDegrees
+		rightAngleInDegrees = jointAngles[1] * radiansToDegrees
+		self.rightMotor.setAbsoluteAngularPositionShortestPath(rightAngleInDegrees,speed)
+		self.leftMotor.setAbsoluteAngularPositionShortestPath(leftAngleInDegrees,speed)
+		
 
 	def moveAngle(q1,q2):
 		"""moves robot arm simulator to angle"""

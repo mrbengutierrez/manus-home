@@ -403,6 +403,7 @@ class NanotecWrapper(NanotecMotorAbstract):
 		return sharedCLibrary.NanotecMotor_setAbsoluteAngularPosition(self.obj, angPos, angVel)
 	
 	def setAbsoluteAngularPositionShortestPath(self, angPos,angVel = 200):
+		print(angPos)
 		return sharedCLibrary.NanotecMotor_setAbsoluteAngularPositionShortestPath(self.obj, angPos, angVel)
 	
 	def stop(self):

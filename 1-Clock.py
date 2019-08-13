@@ -3,6 +3,8 @@ import sys, math, random, time, subprocess, re, select
 # import python library to control nanotec motors
 from robot_control.CheaperManusController import ArmController
 
+import pygame # for sounds
+
 import os
 os.chdir("../rehab-games")
 
@@ -108,6 +110,10 @@ class Score(QGraphicsItem):             # set score indicator
 
 	def TrialSet(self, trial):
 		self.textCount = "{0:2d}".format(trial)
+		# gets called when goal is scored
+		pygame.mixer.init()
+		pygame.mixer.music.load("sounds/a_tone.wav")
+		pygame.mixer.music.play()
 
 	def boundingRect(self):
 		return QRectF(0, 0, 300, 600)
