@@ -260,7 +260,7 @@ ctypes.byref(...) 									& 			pass by reference (suitable for arguments return
 import ctypes # Python standard library for managing Python to c interfacing
 
 # Shared C Library for the NanotecMotor.cpp
-sharedCLibrary = ctypes.cdll.LoadLibrary('../NanotecMotor.so')
+sharedCLibrary = ctypes.cdll.LoadLibrary('nanotec-motor/NanotecMotor.so')
 
 
 class NanotecWrapper(NanotecMotorAbstract):

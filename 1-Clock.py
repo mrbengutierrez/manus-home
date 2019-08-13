@@ -1,6 +1,7 @@
 import sys, math, random, time, subprocess, re, select
 
-import NanotecLibrary as NT # import python library to control nanotec motors
+# import python library to control nanotec motors
+from NanotecLibrary import NanotecWrapper as NanotecMotor
 
 import os
 os.chdir("../rehab-games")
@@ -147,11 +148,11 @@ class gamewindow(QGraphicsView):
 		# initialize motors
 		serialPort1 = "/dev/ttyACM0"
 		ID1 = 1
-		self.motor1 = NT.NanotecMotor(serialPort1,ID1)
+		self.motor1 = NanotecMotor(serialPort1,ID1)
 		
 		serialPort2 = "/dev/ttyACM1"
 		ID2 = 2
-		self.motor2 = NT.NanotecMotor(serialPort2,ID2)
+		self.motor2 = NanotecMotor(serialPort2,ID2)
 
 	def ManusSetting(self):
 		self.cursorX = 0        # cordinate of MIT - Manus X

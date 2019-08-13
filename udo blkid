@@ -1,0 +1,334 @@
+[    0.000000] Booting Linux on physical CPU 0x0
+[    0.000000] Linux version 4.19.57-v7+ (dom@buildbot) (gcc version 4.9.3 (crosstool-NG crosstool-ng-1.22.0-88-g8460611)) #1244 SMP Thu Jul 4 18:45:25 BST 2019
+[    0.000000] CPU: ARMv7 Processor [410fd034] revision 4 (ARMv7), cr=10c5383d
+[    0.000000] CPU: div instructions available: patching division code
+[    0.000000] CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
+[    0.000000] OF: fdt: Machine model: Raspberry Pi 3 Model B Rev 1.2
+[    0.000000] Memory policy: Data cache writealloc
+[    0.000000] cma: Reserved 8 MiB at 0x3ac00000
+[    0.000000] On node 0 totalpages: 242688
+[    0.000000]   Normal zone: 2133 pages used for memmap
+[    0.000000]   Normal zone: 0 pages reserved
+[    0.000000]   Normal zone: 242688 pages, LIFO batch:63
+[    0.000000] random: get_random_bytes called from start_kernel+0xac/0x4b4 with crng_init=0
+[    0.000000] percpu: Embedded 17 pages/cpu s39488 r8192 d21952 u69632
+[    0.000000] pcpu-alloc: s39488 r8192 d21952 u69632 alloc=17*4096
+[    0.000000] pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3 
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 240555
+[    0.000000] Kernel command line: coherent_pool=1M 8250.nr_uarts=0 bcm2708_fb.fbwidth=1366 bcm2708_fb.fbheight=768 bcm2708_fb.fbswap=1 vc_mem.mem_base=0x3ec00000 vc_mem.mem_size=0x40000000  dwc_otg.lpm_enable=0 console=ttyS0,115200 console=tty1 root=/dev/mmcblk0p7 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait quiet splash plymouth.ignore-serial-consoles
+[    0.000000] Dentry cache hash table entries: 131072 (order: 7, 524288 bytes)
+[    0.000000] Inode-cache hash table entries: 65536 (order: 6, 262144 bytes)
+[    0.000000] Memory: 939088K/970752K available (8192K kernel code, 629K rwdata, 2176K rodata, 1024K init, 821K bss, 23472K reserved, 8192K cma-reserved)
+[    0.000000] Virtual kernel memory layout:
+                   vector  : 0xffff0000 - 0xffff1000   (   4 kB)
+                   fixmap  : 0xffc00000 - 0xfff00000   (3072 kB)
+                   vmalloc : 0xbb800000 - 0xff800000   (1088 MB)
+                   lowmem  : 0x80000000 - 0xbb400000   ( 948 MB)
+                   modules : 0x7f000000 - 0x80000000   (  16 MB)
+                     .text : 0x(ptrval) - 0x(ptrval)   (9184 kB)
+                     .init : 0x(ptrval) - 0x(ptrval)   (1024 kB)
+                     .data : 0x(ptrval) - 0x(ptrval)   ( 630 kB)
+                      .bss : 0x(ptrval) - 0x(ptrval)   ( 822 kB)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
+[    0.000000] ftrace: allocating 26351 entries in 78 pages
+[    0.000000] rcu: Hierarchical RCU implementation.
+[    0.000000] NR_IRQS: 16, nr_irqs: 16, preallocated irqs: 16
+[    0.000000] arch_timer: cp15 timer(s) running at 19.20MHz (phys).
+[    0.000000] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x46d987e47, max_idle_ns: 440795202767 ns
+[    0.000007] sched_clock: 56 bits at 19MHz, resolution 52ns, wraps every 4398046511078ns
+[    0.000018] Switching to timer-based delay loop, resolution 52ns
+[    0.000275] Console: colour dummy device 80x30
+[    0.000294] console [tty1] enabled
+[    0.000335] Calibrating delay loop (skipped), value calculated using timer frequency.. 38.40 BogoMIPS (lpj=192000)
+[    0.000351] pid_max: default: 32768 minimum: 301
+[    0.000692] Mount-cache hash table entries: 2048 (order: 1, 8192 bytes)
+[    0.000707] Mountpoint-cache hash table entries: 2048 (order: 1, 8192 bytes)
+[    0.001623] CPU: Testing write buffer coherency: ok
+[    0.002085] CPU0: thread -1, cpu 0, socket 0, mpidr 80000000
+[    0.002742] Setting up static identity map for 0x100000 - 0x10003c
+[    0.002893] rcu: Hierarchical SRCU implementation.
+[    0.003693] smp: Bringing up secondary CPUs ...
+[    0.004526] CPU1: thread -1, cpu 1, socket 0, mpidr 80000001
+[    0.005454] CPU2: thread -1, cpu 2, socket 0, mpidr 80000002
+[    0.006322] CPU3: thread -1, cpu 3, socket 0, mpidr 80000003
+[    0.006446] smp: Brought up 1 node, 4 CPUs
+[    0.006458] SMP: Total of 4 processors activated (153.60 BogoMIPS).
+[    0.006464] CPU: All CPU(s) started in HYP mode.
+[    0.006469] CPU: Virtualization extensions available.
+[    0.007443] devtmpfs: initialized
+[    0.020600] VFP support v0.3: implementor 41 architecture 3 part 40 variant 3 rev 4
+[    0.020841] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+[    0.020860] futex hash table entries: 1024 (order: 4, 65536 bytes)
+[    0.021449] pinctrl core: initialized pinctrl subsystem
+[    0.022313] NET: Registered protocol family 16
+[    0.025366] DMA: preallocated 1024 KiB pool for atomic coherent allocations
+[    0.031138] hw-breakpoint: found 5 (+1 reserved) breakpoint and 4 watchpoint registers.
+[    0.031146] hw-breakpoint: maximum watchpoint size is 8 bytes.
+[    0.031350] Serial: AMBA PL011 UART driver
+[    0.033636] bcm2835-mbox 3f00b880.mailbox: mailbox enabled
+[    0.068849] bcm2835-dma 3f007000.dma: DMA legacy API manager at (ptrval), dmachans=0x1
+[    0.070529] SCSI subsystem initialized
+[    0.070758] usbcore: registered new interface driver usbfs
+[    0.070820] usbcore: registered new interface driver hub
+[    0.070916] usbcore: registered new device driver usb
+[    0.090130] raspberrypi-firmware soc:firmware: Attached to firmware from 2019-07-09 14:40, variant start
+[    0.100386] raspberrypi-firmware soc:firmware: Firmware hash is 6c3fe3f096a93de3b34252ad98cdccadeb534be2
+[    0.111848] clocksource: Switched to clocksource arch_sys_counter
+[    0.200640] VFS: Disk quotas dquot_6.6.0
+[    0.200723] VFS: Dquot-cache hash table entries: 1024 (order 0, 4096 bytes)
+[    0.200913] FS-Cache: Loaded
+[    0.201122] CacheFiles: Loaded
+[    0.211132] NET: Registered protocol family 2
+[    0.211941] tcp_listen_portaddr_hash hash table entries: 512 (order: 0, 6144 bytes)
+[    0.211979] TCP established hash table entries: 8192 (order: 3, 32768 bytes)
+[    0.212089] TCP bind hash table entries: 8192 (order: 4, 65536 bytes)
+[    0.212275] TCP: Hash tables configured (established 8192 bind 8192)
+[    0.212410] UDP hash table entries: 512 (order: 2, 16384 bytes)
+[    0.212457] UDP-Lite hash table entries: 512 (order: 2, 16384 bytes)
+[    0.212767] NET: Registered protocol family 1
+[    0.213353] RPC: Registered named UNIX socket transport module.
+[    0.213359] RPC: Registered udp transport module.
+[    0.213365] RPC: Registered tcp transport module.
+[    0.213371] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    0.215109] hw perfevents: enabled with armv7_cortex_a7 PMU driver, 7 counters available
+[    0.218075] Initialise system trusted keyrings
+[    0.218268] workingset: timestamp_bits=14 max_order=18 bucket_order=4
+[    0.228064] FS-Cache: Netfs 'nfs' registered for caching
+[    0.228627] NFS: Registering the id_resolver key type
+[    0.228663] Key type id_resolver registered
+[    0.228670] Key type id_legacy registered
+[    0.228686] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    0.230964] Key type asymmetric registered
+[    0.230974] Asymmetric key parser 'x509' registered
+[    0.231029] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 250)
+[    0.231186] io scheduler noop registered
+[    0.231193] io scheduler deadline registered (default)
+[    0.231375] io scheduler cfq registered
+[    0.231383] io scheduler mq-deadline registered (default)
+[    0.231390] io scheduler kyber registered
+[    0.234644] bcm2708_fb soc:fb: FB found 1 display(s)
+[    0.265020] Console: switching to colour frame buffer device 170x48
+[    0.281586] bcm2708_fb soc:fb: Registered framebuffer for display 0, size 1366x768
+[    0.283752] bcm2835-rng 3f104000.rng: hwrng registered
+[    0.284062] vc-mem: phys_addr:0x00000000 mem_base=0x3ec00000 mem_size:0x40000000(1024 MiB)
+[    0.284582] vc-sm: Videocore shared memory driver
+[    0.284898] gpiomem-bcm2835 3f200000.gpiomem: Initialised: Registers at 0x3f200000
+[    0.295763] brd: module loaded
+[    0.305942] loop: module loaded
+[    0.306552] Loading iSCSI transport class v2.0-870.
+[    0.307265] libphy: Fixed MDIO Bus: probed
+[    0.307366] usbcore: registered new interface driver lan78xx
+[    0.307431] usbcore: registered new interface driver smsc95xx
+[    0.307447] dwc_otg: version 3.00a 10-AUG-2012 (platform bus)
+[    0.335314] dwc_otg 3f980000.usb: base=(ptrval)
+[    0.535561] Core Release: 2.80a
+[    0.535571] Setting default values for core params
+[    0.535602] Finished setting default values for core params
+[    0.735895] Using Buffer DMA mode
+[    0.735904] Periodic Transfer Interrupt Enhancement - disabled
+[    0.735910] Multiprocessor Interrupt Enhancement - disabled
+[    0.735917] OTG VER PARAM: 0, OTG VER FLAG: 0
+[    0.735935] Dedicated Tx FIFOs mode
+[    0.736400] WARN::dwc_otg_hcd_init:1045: FIQ DMA bounce buffers: virt = bad04000 dma = 0xfad04000 len=9024
+[    0.736426] FIQ FSM acceleration enabled for :
+               Non-periodic Split Transactions
+               Periodic Split Transactions
+               High-Speed Isochronous Endpoints
+               Interrupt/Control Split Transaction hack enabled
+[    0.736434] dwc_otg: Microframe scheduler enabled
+[    0.736492] WARN::hcd_init_fiq:457: FIQ on core 1
+[    0.736503] WARN::hcd_init_fiq:458: FIQ ASM at 80650d3c length 36
+[    0.736516] WARN::hcd_init_fiq:497: MPHI regs_base at bb810000
+[    0.736534] dwc_otg 3f980000.usb: DWC OTG Controller
+[    0.736567] dwc_otg 3f980000.usb: new USB bus registered, assigned bus number 1
+[    0.736602] dwc_otg 3f980000.usb: irq 56, io mem 0x00000000
+[    0.736650] Init: Port Power? op_state=1
+[    0.736657] Init: Power Port (0)
+[    0.736914] usb usb1: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 4.19
+[    0.736926] usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+[    0.736935] usb usb1: Product: DWC OTG Controller
+[    0.736944] usb usb1: Manufacturer: Linux 4.19.57-v7+ dwc_otg_hcd
+[    0.736953] usb usb1: SerialNumber: 3f980000.usb
+[    0.737586] hub 1-0:1.0: USB hub found
+[    0.737632] hub 1-0:1.0: 1 port detected
+[    0.738222] dwc_otg: FIQ enabled
+[    0.738229] dwc_otg: NAK holdoff enabled
+[    0.738234] dwc_otg: FIQ split-transaction FSM enabled
+[    0.738246] Module dwc_common_port init
+[    0.738519] usbcore: registered new interface driver usb-storage
+[    0.738695] mousedev: PS/2 mouse device common for all mice
+[    0.739560] bcm2835-wdt bcm2835-wdt: Broadcom BCM2835 watchdog timer
+[    0.739801] bcm2835-cpufreq: min=600000 max=1200000
+[    0.740275] sdhci: Secure Digital Host Controller Interface driver
+[    0.740281] sdhci: Copyright(c) Pierre Ossman
+[    0.740654] mmc-bcm2835 3f300000.mmcnr: could not get clk, deferring probe
+[    0.741037] sdhost-bcm2835 3f202000.mmc: could not get clk, deferring probe
+[    0.741161] sdhci-pltfm: SDHCI platform and OF driver helper
+[    0.742718] ledtrig-cpu: registered to indicate activity on CPUs
+[    0.742911] hidraw: raw HID events driver (C) Jiri Kosina
+[    0.743084] usbcore: registered new interface driver usbhid
+[    0.743090] usbhid: USB HID core driver
+[    0.744058] vchiq: vchiq_init_state: slot_zero = (ptrval), is_master = 0
+[    0.745586] [vc_sm_connected_init]: start
+[    0.754723] [vc_sm_connected_init]: end - returning 0
+[    0.755831] Initializing XFRM netlink socket
+[    0.755854] NET: Registered protocol family 17
+[    0.755963] Key type dns_resolver registered
+[    0.756543] Registering SWP/SWPB emulation handler
+[    0.757195] registered taskstats version 1
+[    0.757212] Loading compiled-in X.509 certificates
+[    0.764433] uart-pl011 3f201000.serial: cts_event_workaround enabled
+[    0.764518] 3f201000.serial: ttyAMA0 at MMIO 0x3f201000 (irq = 81, base_baud = 0) is a PL011 rev2
+[    0.766362] mmc-bcm2835 3f300000.mmcnr: mmc_debug:0 mmc_debug2:0
+[    0.766372] mmc-bcm2835 3f300000.mmcnr: DMA channel allocated
+[    0.792623] sdhost: log_buf @ (ptrval) (fad07000)
+[    0.828715] mmc1: queuing unknown CIS tuple 0x80 (2 bytes)
+[    0.830275] mmc1: queuing unknown CIS tuple 0x80 (3 bytes)
+[    0.831867] mmc1: queuing unknown CIS tuple 0x80 (3 bytes)
+[    0.834675] mmc1: queuing unknown CIS tuple 0x80 (7 bytes)
+[    0.840713] mmc0: sdhost-bcm2835 loaded - DMA enabled (>1)
+[    0.842060] of_cfs_init
+[    0.842167] of_cfs_init: OK
+[    0.842859] Waiting for root device /dev/mmcblk0p7...
+[    0.906244] random: fast init done
+[    0.929080] mmc0: host does not support reading read-only switch, assuming write-enable
+[    0.932855] mmc0: new high speed SDHC card at address aaaa
+[    0.934181] mmcblk0: mmc0:aaaa SC16G 14.8 GiB
+[    0.939625]  mmcblk0: p1 p2 < p5 p6 p7 >
+[    0.949439] mmc1: new high speed SDIO card at address 0001
+[    0.966689] EXT4-fs (mmcblk0p7): mounted filesystem with ordered data mode. Opts: (null)
+[    0.966744] VFS: Mounted root (ext4 filesystem) readonly on device 179:7.
+[    0.972029] Indeed it is in host mode hprt0 = 00021501
+[    0.974373] devtmpfs: mounted
+[    1.033876] Freeing unused kernel memory: 1024K
+[    1.062272] Run /sbin/init as init process
+[    1.181910] usb 1-1: new high-speed USB device number 2 using dwc_otg
+[    1.182052] Indeed it is in host mode hprt0 = 00001101
+[    1.422245] usb 1-1: New USB device found, idVendor=0424, idProduct=9514, bcdDevice= 2.00
+[    1.422262] usb 1-1: New USB device strings: Mfr=0, Product=0, SerialNumber=0
+[    1.422966] hub 1-1:1.0: USB hub found
+[    1.423061] hub 1-1:1.0: 5 ports detected
+[    1.655152] systemd[1]: System time before build time, advancing clock.
+[    1.741903] usb 1-1.1: new high-speed USB device number 3 using dwc_otg
+[    1.776069] NET: Registered protocol family 10
+[    1.777352] Segment Routing with IPv6
+[    1.822156] systemd[1]: systemd 241 running in system mode. (+PAM +AUDIT +SELINUX +IMA +APPARMOR +SMACK +SYSVINIT +UTMP +LIBCRYPTSETUP +GCRYPT +GNUTLS +ACL +XZ +LZ4 +SECCOMP +BLKID +ELFUTILS +KMOD -IDN2 +IDN -PCRE2 default-hierarchy=hybrid)
+[    1.823057] systemd[1]: Detected architecture arm.
+[    1.831327] systemd[1]: Set hostname to <raspberrypi>.
+[    1.843447] systemd[1]: Failed to bump fs.file-max, ignoring: Invalid argument
+[    1.882533] usb 1-1.1: New USB device found, idVendor=0424, idProduct=ec00, bcdDevice= 2.00
+[    1.882555] usb 1-1.1: New USB device strings: Mfr=0, Product=0, SerialNumber=0
+[    1.885632] smsc95xx v1.0.6
+[    1.976593] smsc95xx 1-1.1:1.0 eth0: register 'smsc95xx' at usb-3f980000.usb-1.1, smsc95xx USB 2.0 Ethernet, b8:27:eb:37:6d:46
+[    2.081938] usb 1-1.2: new low-speed USB device number 4 using dwc_otg
+[    2.155116] systemd[1]: File /lib/systemd/system/systemd-journald.service:12 configures an IP firewall (IPAddressDeny=any), but the local system does not support BPF/cgroup based firewalling.
+[    2.155142] systemd[1]: Proceeding WITHOUT firewalling in effect! (This warning is only shown for the first loaded unit using IP firewalling.)
+[    2.245679] usb 1-1.2: New USB device found, idVendor=413c, idProduct=2112, bcdDevice= 1.07
+[    2.245696] usb 1-1.2: New USB device strings: Mfr=1, Product=2, SerialNumber=0
+[    2.245706] usb 1-1.2: Product: Dell USB Wired Multimedia Keyboard
+[    2.245715] usb 1-1.2: Manufacturer: DELL
+[    2.258203] input: DELL Dell USB Wired Multimedia Keyboard as /devices/platform/soc/3f980000.usb/usb1/1-1/1-1.2/1-1.2:1.0/0003:413C:2112.0001/input/input0
+[    2.322504] hid-generic 0003:413C:2112.0001: input,hidraw0: USB HID v1.10 Keyboard [DELL Dell USB Wired Multimedia Keyboard] on usb-3f980000.usb-1.2/input0
+[    2.342149] input: DELL Dell USB Wired Multimedia Keyboard System Control as /devices/platform/soc/3f980000.usb/usb1/1-1/1-1.2/1-1.2:1.1/0003:413C:2112.0002/input/input1
+[    2.412168] input: DELL Dell USB Wired Multimedia Keyboard Consumer Control as /devices/platform/soc/3f980000.usb/usb1/1-1/1-1.2/1-1.2:1.1/0003:413C:2112.0002/input/input2
+[    2.412420] hid-generic 0003:413C:2112.0002: input,hidraw1: USB HID v1.10 Device [DELL Dell USB Wired Multimedia Keyboard] on usb-3f980000.usb-1.2/input1
+[    2.511915] usb 1-1.4: new low-speed USB device number 5 using dwc_otg
+[    2.655140] random: systemd: uninitialized urandom read (16 bytes read)
+[    2.659812] usb 1-1.4: New USB device found, idVendor=046d, idProduct=c063, bcdDevice=57.00
+[    2.659828] usb 1-1.4: New USB device strings: Mfr=1, Product=2, SerialNumber=0
+[    2.659838] usb 1-1.4: Product: DELL USB Laser Mouse
+[    2.659847] usb 1-1.4: Manufacturer: DELL
+[    2.667449] random: systemd: uninitialized urandom read (16 bytes read)
+[    2.668223] systemd[1]: Set up automount Arbitrary Executable File Formats File System Automount Point.
+[    2.668529] random: systemd: uninitialized urandom read (16 bytes read)
+[    2.669253] systemd[1]: Listening on Journal Socket.
+[    2.670089] systemd[1]: Condition check resulted in Huge Pages File System being skipped.
+[    2.677496] input: DELL DELL USB Laser Mouse as /devices/platform/soc/3f980000.usb/usb1/1-1/1-1.4/1-1.4:1.0/0003:046D:C063.0003/input/input3
+[    2.677876] hid-generic 0003:046D:C063.0003: input,hidraw2: USB HID v1.10 Mouse [DELL DELL USB Laser Mouse] on usb-3f980000.usb-1.4/input0
+[    2.679959] systemd[1]: Listening on Syslog Socket.
+[    2.913100] i2c /dev entries driver
+[    3.184266] EXT4-fs (mmcblk0p7): re-mounted. Opts: (null)
+[    3.341764] systemd-journald[107]: Received request to flush runtime journal from PID 1
+[    3.977056] media: Linux media interface: v0.10
+[    4.001178] vc_sm_cma: module is from the staging directory, the quality is unknown, you have been warned.
+[    4.005148] bcm2835_vc_sm_cma_probe: Videocore shared memory driver
+[    4.005171] [vc_sm_connected_init]: start
+[    4.008731] [vc_sm_connected_init]: installed successfully
+[    4.019973] videodev: Linux video capture interface: v2.00
+[    4.057138] bcm2835_mmal_vchiq: module is from the staging directory, the quality is unknown, you have been warned.
+[    4.096248] bcm2835_v4l2: module is from the staging directory, the quality is unknown, you have been warned.
+[    4.101373] bcm2835_codec: module is from the staging directory, the quality is unknown, you have been warned.
+[    4.120371] bcm2835-codec bcm2835-codec: Device registered as /dev/video10
+[    4.120386] bcm2835-codec bcm2835-codec: Loaded V4L2 decode
+[    4.133201] bcm2835-codec bcm2835-codec: Device registered as /dev/video11
+[    4.133225] bcm2835-codec bcm2835-codec: Loaded V4L2 encode
+[    4.144886] bcm2835-codec bcm2835-codec: Device registered as /dev/video12
+[    4.144904] bcm2835-codec bcm2835-codec: Loaded V4L2 isp
+[    4.155988] snd_bcm2835: module is from the staging directory, the quality is unknown, you have been warned.
+[    4.175698] bcm2835_audio soc:audio: card created with 8 channels
+[    4.363046] cfg80211: Loading compiled-in X.509 certificates for regulatory database
+[    4.547144] cfg80211: Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+[    4.692201] brcmfmac: F1 signature read @0x18000000=0x1541a9a6
+[    4.699152] brcmfmac: brcmf_fw_alloc_request: using brcm/brcmfmac43430-sdio for chip BCM43430/1
+[    4.699452] usbcore: registered new interface driver brcmfmac
+[    4.906050] brcmfmac: brcmf_fw_alloc_request: using brcm/brcmfmac43430-sdio for chip BCM43430/1
+[    4.906156] brcmfmac: brcmf_c_process_clm_blob: no clm_blob available (err=-2), device may have limited channels available
+[    4.906966] brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM43430/1 wl0: Oct 23 2017 03:55:53 version 7.45.98.38 (r674442 CY) FWID 01-e58d219f
+[    6.545750] random: crng init done
+[    6.545766] random: 7 urandom warning(s) missed due to ratelimiting
+[    7.305196] uart-pl011 3f201000.serial: no DMA platform data
+[    7.370632] 8021q: 802.1Q VLAN Support v1.8
+[    7.754122] Adding 102396k swap on /var/swap.  Priority:-2 extents:1 across:102396k SSFS
+[    7.844350] IPv6: ADDRCONF(NETDEV_UP): wlan0: link is not ready
+[    7.844374] brcmfmac: power management disabled
+[    8.335152] smsc95xx 1-1.1:1.0 eth0: hardware isn't capable of remote wakeup
+[    8.335487] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[    9.456036] IPv6: ADDRCONF(NETDEV_CHANGE): wlan0: link becomes ready
+[   12.122676] Bluetooth: Core ver 2.22
+[   12.122779] NET: Registered protocol family 31
+[   12.122786] Bluetooth: HCI device and connection manager initialized
+[   12.122809] Bluetooth: HCI socket layer initialized
+[   12.122823] Bluetooth: L2CAP socket layer initialized
+[   12.122864] Bluetooth: SCO socket layer initialized
+[   12.143335] Bluetooth: HCI UART driver ver 2.3
+[   12.143350] Bluetooth: HCI UART protocol H4 registered
+[   12.143455] Bluetooth: HCI UART protocol Three-wire (H5) registered
+[   12.143670] Bluetooth: HCI UART protocol Broadcom registered
+[   12.508551] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[   12.508562] Bluetooth: BNEP filters: protocol multicast
+[   12.508581] Bluetooth: BNEP socket layer initialized
+[   12.576178] Bluetooth: RFCOMM TTY layer initialized
+[   12.576203] Bluetooth: RFCOMM socket layer initialized
+[   12.576232] Bluetooth: RFCOMM ver 1.11
+[   13.759340] fuse init (API version 7.27)
+[  558.484249] usb 1-1.3: new full-speed USB device number 6 using dwc_otg
+[  558.653538] usb 1-1.3: New USB device found, idVendor=04f3, idProduct=249f, bcdDevice=57.13
+[  558.653548] usb 1-1.3: New USB device strings: Mfr=4, Product=14, SerialNumber=0
+[  558.653553] usb 1-1.3: Product: Touchscreen
+[  558.653558] usb 1-1.3: Manufacturer: ELAN
+[  558.835052] input: ELAN Touchscreen Touchscreen as /devices/platform/soc/3f980000.usb/usb1/1-1/1-1.3/1-1.3:1.0/0003:04F3:249F.0004/input/input4
+[  558.836544] input: ELAN Touchscreen as /devices/platform/soc/3f980000.usb/usb1/1-1/1-1.3/1-1.3:1.0/0003:04F3:249F.0004/input/input5
+[  558.837279] input: ELAN Touchscreen as /devices/platform/soc/3f980000.usb/usb1/1-1/1-1.3/1-1.3:1.0/0003:04F3:249F.0004/input/input6
+[  558.840033] hid-generic 0003:04F3:249F.0004: input,hiddev96,hidraw3: USB HID v1.10 Device [ELAN Touchscreen] on usb-3f980000.usb-1.3/input0
+[  559.095741] input: ELAN Touchscreen as /devices/platform/soc/3f980000.usb/usb1/1-1/1-1.3/1-1.3:1.0/0003:04F3:249F.0004/input/input8
+[  559.096220] hid-multitouch 0003:04F3:249F.0004: input,hiddev96,hidraw3: USB HID v1.10 Device [ELAN Touchscreen] on usb-3f980000.usb-1.3/input0
+[  593.314771] usb 1-1.3: USB disconnect, device number 6
+[ 1855.753875] usb 1-1.2: USB disconnect, device number 4
+[ 1858.193541] usb 1-1.5: new low-speed USB device number 7 using dwc_otg
+[ 1858.348664] usb 1-1.5: New USB device found, idVendor=413c, idProduct=2112, bcdDevice= 1.07
+[ 1858.348674] usb 1-1.5: New USB device strings: Mfr=1, Product=2, SerialNumber=0
+[ 1858.348680] usb 1-1.5: Product: Dell USB Wired Multimedia Keyboard
+[ 1858.348684] usb 1-1.5: Manufacturer: DELL
+[ 1858.362978] input: DELL Dell USB Wired Multimedia Keyboard as /devices/platform/soc/3f980000.usb/usb1/1-1/1-1.5/1-1.5:1.0/0003:413C:2112.0005/input/input12
+[ 1858.425204] hid-generic 0003:413C:2112.0005: input,hidraw0: USB HID v1.10 Keyboard [DELL Dell USB Wired Multimedia Keyboard] on usb-3f980000.usb-1.5/input0
+[ 1858.445887] input: DELL Dell USB Wired Multimedia Keyboard System Control as /devices/platform/soc/3f980000.usb/usb1/1-1/1-1.5/1-1.5:1.1/0003:413C:2112.0006/input/input13
+[ 1858.513998] input: DELL Dell USB Wired Multimedia Keyboard Consumer Control as /devices/platform/soc/3f980000.usb/usb1/1-1/1-1.5/1-1.5:1.1/0003:413C:2112.0006/input/input14
+[ 1858.515148] hid-generic 0003:413C:2112.0006: input,hidraw1: USB HID v1.10 Device [DELL Dell USB Wired Multimedia Keyboard] on usb-3f980000.usb-1.5/input1
+[ 2501.782587] usb 1-1.2: new full-speed USB device number 8 using dwc_otg
+[ 2501.951785] usb 1-1.2: New USB device found, idVendor=04f3, idProduct=249f, bcdDevice=57.13
+[ 2501.951796] usb 1-1.2: New USB device strings: Mfr=4, Product=14, SerialNumber=0
+[ 2501.951801] usb 1-1.2: Product: Touchscreen
+[ 2501.951806] usb 1-1.2: Manufacturer: ELAN
+[ 2502.140291] input: ELAN Touchscreen as /devices/platform/soc/3f980000.usb/usb1/1-1/1-1.2/1-1.2:1.0/0003:04F3:249F.0007/input/input15
+[ 2502.144117] hid-multitouch 0003:04F3:249F.0007: input,hiddev96,hidraw3: USB HID v1.10 Device [ELAN Touchscreen] on usb-3f980000.usb-1.2/input0
+[ 2518.572557] usb 1-1.2: USB disconnect, device number 8
