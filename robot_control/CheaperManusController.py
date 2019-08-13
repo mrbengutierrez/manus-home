@@ -6,7 +6,7 @@ email: bengutie@mit.edu
 """
 
 
-
+import time # for print functions
 
 
 import numpy as np
@@ -14,7 +14,7 @@ import matplotlib.pylab as plt
 import scipy as sp
 
 # import python library to control nanotec motors
-from NanotecLibrary import NanotecWrapper as NanotecMotor
+from robot_control.NanotecLibrary import NanotecWrapper as NanotecMotor
 
 class Graphics:
 
@@ -200,21 +200,38 @@ class ArmController:
 		"""moves robot arm simulator to angle"""
 		return
 	
-
+	def calibratePosition(self):
+		"""Use to calibrate that absolute angular position of the nanotec-motor with the robot arm
+			
+			Mount the robot arm in the configuration specified by the prompt given.
+		"""
+		self.rightMotor.setAbsoluteAngularPositionShortestPath(90.0)
+		self.leftMotor.setAbsoluteAngularPositionShortestPath(180.0)
+		time.sleep(1)
+		self.printPositionInformation()
+		time.sleep(5)
+		self.rightMotor.stop()
+		self.leftMotor.stop()
 		
-	def printPositionInformationContinuously():
-		"""prints the angle of each motor in degrees"""
+	def printPositionInformation(self):
+		"""Prints the position information for the robot"""
 		rightAngleInDegrees = self.rightMotor.getAbsoluteAngularPosition()
 		leftAngleInDegrees = self.leftMotor.getAbsoluteAngularPosition()
 		print("Right Motor: " + str(rightAngleInDegrees))
-		print("Left Motor: " + str(leftMotorInDegrees))
+		print("Left Motor: " + str(leftAngleInDegrees))
 		
 		position = self.getPosition()
 		print("x: " +  str(position[0]) + "y: " + str(position[1]))
-		print("")
-		time.Sleep(1)
+		print("")	
+
 		
-	def getPosition():
+	def printPositionInformationContinuously(self):
+		"""prints the angle of each motor in degrees"""
+		while(True):
+			self.printPositionInformation()
+			time.sleep(1)
+		
+	def getPosition(self):
 		"""Returns the position of the robot arm in meters"""
 		rightAngleInDegrees = self.rightMotor.getAbsoluteAngularPosition()
 		leftAngleInDegrees = self.leftMotor.getAbsoluteAngularPosition()
@@ -223,10 +240,10 @@ class ArmController:
 		
 		rightAngleInRadians = rightAngleInDegrees * degreesToRadians
 		leftAngleInRadians = leftAngleInDegrees * degreesToRadians
-		q1 = rightAngleInRadians
-		q2 = leftAngleinRadians
+		q1 = leftAngleInRadians
+		q2 = rightAngleInRadians
 		
-		position = forwardKinematics(q1,q2)
+		position = self.forwardKinematics(q1,q2)
 		return position
 		
 		

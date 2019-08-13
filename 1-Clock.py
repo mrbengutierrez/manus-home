@@ -1,7 +1,7 @@
 import sys, math, random, time, subprocess, re, select
 
 # import python library to control nanotec motors
-from NanotecLibrary import NanotecWrapper as NanotecMotor
+from robot_control.CheaperManusController import ArmController
 
 import os
 os.chdir("../rehab-games")
@@ -11,7 +11,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 winWidth = 1300
-winHeight = 900
+winHeight = 750
 
 nc_cmd = 'netcat 192.168.1.12 3333'
 process = subprocess.Popen(nc_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
@@ -146,13 +146,7 @@ class gamewindow(QGraphicsView):
 		self.ManusSetting()
 		
 		# initialize motors
-		serialPort1 = "/dev/ttyACM0"
-		ID1 = 1
-		self.motor1 = NanotecMotor(serialPort1,ID1)
-		
-		serialPort2 = "/dev/ttyACM1"
-		ID2 = 2
-		self.motor2 = NanotecMotor(serialPort2,ID2)
+		self.arm = ArmController()
 
 	def ManusSetting(self):
 		self.cursorX = 0        # cordinate of MIT - Manus X
@@ -200,19 +194,17 @@ class gamewindow(QGraphicsView):
 		global process, winWidth, winHeight
 			
 		if (self.switch == 1):
-			aa_pos_360 = self.motor1.getAbsoluteAngularPosition() # command for load wrist aa_pos value
-			aa_pos = (aa_pos_360 -180.0)/ 360.0 # convert degrees [0,360.0) to [-1,1)
-			if(aa_pos < 0):
-				value_aa = float(aa_pos) * 10.0            # scaling
-			else:
-				value_aa = float(aa_pos) * 4.0             # scaling
-			self.cursorY = int( (winHeight / 2) - ((winHeight / 2) * value_aa))
+			position = self.arm.getPosition()
+			y = position[1]
+			scaledY = -(y-0.4)*8.0  # magic scaling numbers
+			self.cursorY = int( (winHeight / 2) - ((winHeight / 2) * scaledY))
 			self.switch = - self.switch
 		else:
-			fe_pos_360 = self.motor2.getAbsoluteAngularPosition() # command for load wrist_fe_pos value
-			fe_pos = (fe_pos_360 - 180.0)/ 360.0 # convert degrees [0,360.0) to [-1,1)
-			value_fe = float(fe_pos) * 2.0
-			self.cursorX = int( (winWidth / 2) + ((winWidth / 2) * value_fe))
+			position = self.arm.getPosition()
+			x = position[0]			
+			scaledX = -(x+0.01)*3.5 # magic scaling numbers
+
+			self.cursorX = int( (winWidth / 2) + ((winWidth / 2) * scaledX))
 			self.switch = - self.switch
 			
 		self.player.setRect(self.cursorX - int(self.R/2), self.cursorY - int(self.R/2), self.R, self.R)    # show player cursor

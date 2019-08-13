@@ -6,12 +6,14 @@ sudo apt-get install libopencv-dev python3-opencv
 sudo apt-get install python-dev   # for sysv_ipc install
 sudo apt-get install python3-dev # for sysv_ipc install
 
+sudo apt-get install python3-numpy # for arm controller
+sudo apt-get install python3-scipy # for arm controller
+sudo apt-get install python3-matplotlib # for arm controller
+
 # Note: also have to install sysv_ipc located in nanotec-motor
-cd nanotec-motor/sysv_ipc-1.0.0
+cd robot_controller/nanotec_motor/sysv_ipc-1.0.0
 sudo python setup.py install
 sudo python3 setup.py install
 
 
-sudo apt-get install python3-numpy # for arm controller
-sudo apt-get install python3-scipy # for arm controller
-sudo apt-get install python3-matplotlib # for arm controller
+

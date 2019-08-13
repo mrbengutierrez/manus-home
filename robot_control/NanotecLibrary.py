@@ -256,11 +256,25 @@ numpy.ctypeslib.ndpointer(dtype=numpy.int32)] 		int* 		pass a numpy array of typ
 ctypes.byref(...) 									& 			pass by reference (suitable for arguments returning results)
 
 '''
-
+import os
+import glob
 import ctypes # Python standard library for managing Python to c interfacing
 
+
+def findFileInSubdirectories(filename):
+	"""Finds a file recursively in the subdirectories"""
+	for root, dirs, files in os.walk("/"):
+		for file in files:
+			if "NanotecMotor.so" in file:
+				return os.path.join(root,file)
+
 # Shared C Library for the NanotecMotor.cpp
-sharedCLibrary = ctypes.cdll.LoadLibrary('nanotec-motor/NanotecMotor.so')
+sharedCLibraryLocation = findFileInSubdirectories("NanotecMotor.so")
+#print("sharedCLibraryLocation: " + str(sharedCLibraryLocation))
+sharedCLibrary = ctypes.cdll.LoadLibrary(sharedCLibraryLocation)
+
+
+	
 
 
 class NanotecWrapper(NanotecMotorAbstract):
