@@ -14,8 +14,9 @@ import matplotlib.pylab as plt
 import scipy as sp
 
 # import python library to control nanotec motors
-from robot_control.NanotecLibrary import NanotecWrapper as NanotecMotor
+from NanotecLibrary import NanotecWrapper as NanotecMotor
 
+	
 class Graphics:
 
 	def __init__(self):
@@ -31,11 +32,7 @@ class Graphics:
 		
 
 
-	
-		
-		
-	
-class ArmController:
+class Kinematics:
 	def __init__(self):
 		inchesToMeters = 0.0254;
 		self.l1 = 13.25 * inchesToMeters
@@ -43,25 +40,19 @@ class ArmController:
 		self.l3 = 15.5 * inchesToMeters
 		self.l4 = 15.5 * inchesToMeters
 		self.d = 3 * inchesToMeters
-		
-		serialPort0 = "/dev/ttyACM0"
-		ID0 = 0
-		self.rightMotor = NanotecMotor(serialPort0,ID0)
-		
-		serialPort1 = "/dev/ttyACM1"
-		ID1 = 1
-		self.leftMotor = NanotecMotor(serialPort1,ID1)
 
-	def forwardKinematics(self,q1,q2):
+	def forwardKinematics(self,q):
 		"""converts joint angles to end effector position
-
 		Parameters:
-		q1 (float): left joint angle
-		q2 (float): right joint angle
-
+		q (numpy.array of floats)
+			q[0] (float): left joint angle
+			q[1] (float): right joint angle
 		Returns:
-		(tuple of floats): (x,y) The end effector position
+		(np.array of floats): np.array([x,y]) The end effector position
 		"""
+		q1 = q[0]
+		q2 = q[1]
+		
 		x_d = self.l2*np.cos(q2) + self.d
 		y_d = self.l2*np.sin(q2)
 		x_c = self.l1*np.cos(q1) - self.d
@@ -77,18 +68,19 @@ class ArmController:
 		x = x_c + self.l3*np.cos(theta3)
 		y = y_c + self.l3*np.sin(theta3)
 
-		return (x,y)
+		return np.array([x,y])
 
-	def inverseKinematics(self,x,y):
+	def inverseKinematics(self,r):
 		"""converts end effector position to joint angles
-
 		Parameters:
-		x (float): x end effector position in meters
-		y (float): y end effector position in meters
-
+		r (numpy.array of floats)
+			r[0] (float): x end effector position in meters
+			r[1] (float): y end effector position in meters
 		Returns:
-		(tuple of floats): (x,y) The joint parameters
+		(np.array of floats): np.array([x,y]) The joint parameters
 		"""
+		x = r[0]
+		y = r[1]
 
 		# x,y --> q1
 		alpha1 = np.arctan2(y,x+self.d)
@@ -102,30 +94,39 @@ class ArmController:
 		gamma2 = np.arccos( (r2**2 + self.l2**2 - self.l4**2) / (2 * self.l2 * r2) )
 		q2 =  alpha2 - gamma2
 
-		return (q1,q2)
+		return np.array([q1,q2])
 
-	def Jacobian(self,q1,q2):
+	def jacobian(self,q):
 		"""Returns the Jacobian matrix for a given set of joint angles
-
 		Parameters:
-		q1 (float): left joint angle in radians
-		q2 (float): right joint angle in radians
-
+		q (numpy.array of floats)
+			q[0] (float): left joint angle in radians
+			q[1] (float): right joint angle in radians
 		Returns:
-		(numpy.matrix): the Jacobian matrix
+		(2x2 numpy.array): the Jacobian matrix
 		"""
-		pass
+		return self.computeActualJacobian(q)
 
 	def computeActualJacobian(self,q):
 		"""Returns the Jacobian matrix for a given set of joint angles
 			using the actual Jacobian
-
+			
 		Parameters:
-		q (tuple of floats): joint angles in radians, q[0] is left, q[1] is right
-
+		q (numpy.array of floats)
+			q[0] (float): left joint angle in radians
+			q[1] (float): right joint angle in radians
+		
 		Returns:
 		(2x2 numpy.array): the Jacobian matrix
 		"""
+		q1 = q[0]
+		q2 = q[1]
+		
+		l1 = self.l1
+		l2 = self.l2
+		l3 = self.l3
+		l4 = self.l4
+		d = self.d
 		cos = np.cos
 		sin = np.sin
 		acos = np.arccos
@@ -137,85 +138,124 @@ class ArmController:
 		dXdQ2 = -l3*sin(atan2(l2*sin(q2) - l1*sin(q1), 2*d - l1*cos(q1) + l2*cos(q2)) + acos(((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2 + l3**2 - l4**2)/(2*l3*((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2)**(1/2))))*(((2*l2*sin(q2)*(2*d - l1*cos(q1) + l2*cos(q2)) + 2*l2*cos(q2)*(l1*sin(q1) - l2*sin(q2)))/(2*l3*((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2)**(1/2)) - ((2*l2*sin(q2)*(2*d - l1*cos(q1) + l2*cos(q2)) + 2*l2*cos(q2)*(l1*sin(q1) - l2*sin(q2)))*((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2 + l3**2 - l4**2))/(4*l3*((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2)**(3/2)))/(1 - ((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2 + l3**2 - l4**2)**2/(4*l3**2*((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2)))**(1/2) + (((real(l2*cos(q2)) - imag(l2*sin(q2)))/(2*real(d) - real(l1*cos(q1)) + real(l2*cos(q2)) + imag(l1*sin(q1)) - imag(l2*sin(q2))) + ((real(l2*sin(q2)) + imag(l2*cos(q2)))*(real(l2*sin(q2)) - real(l1*sin(q1)) + 2*imag(d) - imag(l1*cos(q1)) + imag(l2*cos(q2))))/(2*real(d) - real(l1*cos(q1)) + real(l2*cos(q2)) + imag(l1*sin(q1)) - imag(l2*sin(q2)))**2)*(2*real(d) - real(l1*cos(q1)) + real(l2*cos(q2)) + imag(l1*sin(q1)) - imag(l2*sin(q2)))**2)/((real(l2*sin(q2)) - real(l1*sin(q1)) + 2*imag(d) - imag(l1*cos(q1)) + imag(l2*cos(q2)))**2 + (2*real(d) - real(l1*cos(q1)) + real(l2*cos(q2)) + imag(l1*sin(q1)) - imag(l2*sin(q2)))**2))
 		dYdQ1 = l1*cos(q1) - l3*cos(atan2(l2*sin(q2) - l1*sin(q1), 2*d - l1*cos(q1) + l2*cos(q2)) + acos(((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2 + l3**2 - l4**2)/(2*l3*((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2)**(1/2))))*(((2*l1*sin(q1)*(2*d - l1*cos(q1) + l2*cos(q2)) + 2*l1*cos(q1)*(l1*sin(q1) - l2*sin(q2)))/(2*l3*((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2)**(1/2)) - ((2*l1*sin(q1)*(2*d - l1*cos(q1) + l2*cos(q2)) + 2*l1*cos(q1)*(l1*sin(q1) - l2*sin(q2)))*((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2 + l3**2 - l4**2))/(4*l3*((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2)**(3/2)))/(1 - ((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2 + l3**2 - l4**2)**2/(4*l3**2*((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2)))**(1/2) + (((real(l1*cos(q1)) - imag(l1*sin(q1)))/(2*real(d) - real(l1*cos(q1)) + real(l2*cos(q2)) + imag(l1*sin(q1)) - imag(l2*sin(q2))) + ((real(l1*sin(q1)) + imag(l1*cos(q1)))*(real(l2*sin(q2)) - real(l1*sin(q1)) + 2*imag(d) - imag(l1*cos(q1)) + imag(l2*cos(q2))))/(2*real(d) - real(l1*cos(q1)) + real(l2*cos(q2)) + imag(l1*sin(q1)) - imag(l2*sin(q2)))**2)*(2*real(d) - real(l1*cos(q1)) + real(l2*cos(q2)) + imag(l1*sin(q1)) - imag(l2*sin(q2)))**2)/((real(l2*sin(q2)) - real(l1*sin(q1)) + 2*imag(d) - imag(l1*cos(q1)) + imag(l2*cos(q2)))**2 + (2*real(d) - real(l1*cos(q1)) + real(l2*cos(q2)) + imag(l1*sin(q1)) - imag(l2*sin(q2)))**2))
 		dYdQ2 = l3*cos(atan2(l2*sin(q2) - l1*sin(q1), 2*d - l1*cos(q1) + l2*cos(q2)) + acos(((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2 + l3**2 - l4**2)/(2*l3*((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2)**(1/2))))*(((2*l2*sin(q2)*(2*d - l1*cos(q1) + l2*cos(q2)) + 2*l2*cos(q2)*(l1*sin(q1) - l2*sin(q2)))/(2*l3*((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2)**(1/2)) - ((2*l2*sin(q2)*(2*d - l1*cos(q1) + l2*cos(q2)) + 2*l2*cos(q2)*(l1*sin(q1) - l2*sin(q2)))*((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2 + l3**2 - l4**2))/(4*l3*((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2)**(3/2)))/(1 - ((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2 + l3**2 - l4**2)**2/(4*l3**2*((l1*sin(q1) - l2*sin(q2))**2 + (2*d - l1*cos(q1) + l2*cos(q2))**2)))**(1/2) + (((real(l2*cos(q2)) - imag(l2*sin(q2)))/(2*real(d) - real(l1*cos(q1)) + real(l2*cos(q2)) + imag(l1*sin(q1)) - imag(l2*sin(q2))) + ((real(l2*sin(q2)) + imag(l2*cos(q2)))*(real(l2*sin(q2)) - real(l1*sin(q1)) + 2*imag(d) - imag(l1*cos(q1)) + imag(l2*cos(q2))))/(2*real(d) - real(l1*cos(q1)) + real(l2*cos(q2)) + imag(l1*sin(q1)) - imag(l2*sin(q2)))**2)*(2*real(d) - real(l1*cos(q1)) + real(l2*cos(q2)) + imag(l1*sin(q1)) - imag(l2*sin(q2)))**2)/((real(l2*sin(q2)) - real(l1*sin(q1)) + 2*imag(d) - imag(l1*cos(q1)) + imag(l2*cos(q2)))**2 + (2*real(d) - real(l1*cos(q1)) + real(l2*cos(q2)) + imag(l1*sin(q1)) - imag(l2*sin(q2)))**2))
+		return np.array([[dXdQ1,dXdQ2],[dYdQ1,dYdQ2]])
+
+	def computeApproximateJacobian(self,q):
+		"""Returns the approximate Jacobian matrix for a given set of joint angles
+		
+		Parameters:
+		q (numpy.array of floats)
+			q[0] (float): left joint angle in radians
+			q[1] (float): right joint angle in radians
+		
+		Returns:
+		(2x2 numpy.array): the Jacobian matrix
+		"""
+		jacobianSize = (2,2)
+		eps = 0.0001 # precision
+		q1 = q[0]
+		q2 = q[1]
+		
+		biggerQ1 = forwardKinematics(q1+eps,q2)
+		smallerQ1 = forwardKinematics(q1-eps,q2)
+		biggerQ2 = forwardKinematics(q1,q2+eps)
+		smallerQ2 = forwardKinematics(q1,q2-eps)
+		
+		dXdQ1 = (biggerQ1[0] - smallerQ1[0]) / (2*eps)
+		dXdQ2 = (biggerQ2[0] - smallerQ2[0]) / (2*eps)
+		dYdQ1 = (biggerQ1[1] - smallerQ1[1]) / (2*eps)
+		dYdQ2 = (biggerQ2[1] - smallerQ2[1]) / (2*eps)
 		return np.array([[dXQ1,dXQ2],[dYdQ1,dYdQ2]])
+		
 
 
-	def torqueToForce(self,t1,t2):
-		"""Converts joint torques to enpoint forces
-
+	def torqueToForce(self,t,q):
+		"""Converts joint torques to endpoint forces
 		Parameters:
-		t1 (float): left joint torque in newton-meters
-		t2 (float): right joint angle in newton-meters
-
+		t (numpy.array of floats)
+			t[0] (float): left joint torque in newton-meters
+			t[1] (float): right joint angle in newton-meters
+		q (numpy.array of floats)
+			q[0] (float): left joint angle in radians
+			q[1] (float): right joint angle in radians
 		Returns:
-		(tuple of floats): (fx,fy) the end effector forces
+		(numpy.array of floats): numpy.array([fx,fy]) the end effector forces
 		"""
-		# TODO
-		return (0,0)
+		jacobianTranspose = np.transpose(self.jacobian(q))
+		jacobianTransposeInverse = np.linalg.inv(jacobianTranspose)
+		force = np.dot(jacobianTransposeInverse,t)
+		return force
 
-	def forceToTorque(self,fx,fy):
+	def forceToTorque(self,f,q):
 		"""Converts endpoint forces to joint torques
-
 		Parameters:
-		fx (float): x endpoint force in newtons
-		fy (float): y endpoint force in newtons
-
+		f (numpy.array of floats)
+			f[0] (float): x endpoint force in newtons
+			f[1] (float): y endpoint force in newtons
+		q (numpy.array of floats)
+			q[0] (float): left joint angle in radians
+			q[1] (float): right joint angle in radians
 		Returns:
-		(tuple of floats): (t1,t2) the joint torques
+		(numpy.array of floats): (t1,t2) the joint torques
 		"""
-		# TODO
-		return (0,0)
+		jacobianTranspose = np.transpose(self.jacobian(q))
+		torque = np.dot(jacobianTranspose,f)
+		return torque
 
-	def angularVelocityToVelocity(self,qDot1,qDot2):
+	def angularVelocityToVelocity(self,qDot,q):
 		"""Converts joint angular velocities to end effector velocity
-
 		Parameters:
-		qDot1 (float): left joint angular velocity in radians per second
-		qDot2 (float): right joint angular velocity in radians per second
-
+		qDot (numpy.array of floats)
+			qDot[0] (float): left joint angular velocity in radians per second
+			qDot[1] (float): right joint angular velocity in radians per second
+		q (numpy.array of floats)
+			q[0] (float): left joint angle in radians
+			q[1] (float): right joint angle in radians
 		Returns:
-		(tuple of floats): (vx,vy) the end effector velocity
+		(numpy.array of floats): numpy.array([vx,vy]) the end effector velocity
 		"""
-		# TODO
-		return (0,0)
+		velocity = np.dot(self.jacobian(q), qDot)
+		return velocity
+		
 
-	def velocityToAngularVelocity(self,vx,vy):
+	def velocityToAngularVelocity(self,v,q):
 		"""Converts the end effector velocity to joint angular velocities
-
 		Parameters:
-		vx (float): x endpoint velocity
-		vy (float): y endpoint velocity
-
+		v (numpy.array of floats)
+			v[0] (float): x endpoint velocity
+			v[1] (float): y endpoint velocity
+		q (numpy.array of floats)
+			q[0] (float): left joint angle in radians
+			q[1] (float): right joint angle in radians
 		Returns:
-		(tuple of floats): (qDot1,qDot2) the joint angular velocities
+		(numpy.array of floats): numpy.array([qDot1,qDot2]) the joint angular velocities
 		"""
-		# TODO
-		return (0,0)      
-
-	def setPosition(self,x,y,speed=10):
-		"""moves robot arm simulator to position
+		inverseJacobian = np.linalg.inv(self.jacobian(q))
+		angularVelocity = np.dot(inverseJacobian,v)
+		return angularVelocity  
 		
-		Parameters:
-		x (float): x end effector position in meters
-		y (float): y end effector position in meters
-		speed (float): speed for actuators to move in rpm (This will be changed later)
 		
-		Returns:
-		None
-		"""
-		jointAngles = self.inverseKinematics(x,y)
-		
-		radiansToDegrees = 180.0 / np.pi
-		leftAngleInDegrees = jointAngles[0] * radiansToDegrees
-		rightAngleInDegrees = jointAngles[1] * radiansToDegrees
-		self.rightMotor.setAbsoluteAngularPositionShortestPath(rightAngleInDegrees,speed)
-		self.leftMotor.setAbsoluteAngularPositionShortestPath(leftAngleInDegrees,speed)
-		
-
-	def moveAngle(q1,q2):
-		"""moves robot arm simulator to angle"""
-		return
 	
+	
+	
+class ArmController(Kinematics):
+	"""This class is responsible for directly controlling the whole robot arm.
+		It inherits a kinematics class which describes the kinematics of the robot arm
+	"""
+	def __init__(self):
+		#initialize kinematics
+		super().__init__()
+		
+		# initialize right motor
+		serialPort0 = "/dev/ttyACM0"
+		ID0 = 0
+		self.rightMotor = NanotecMotor(serialPort0,ID0)
+		
+		# initialize left motor
+		serialPort1 = "/dev/ttyACM1"
+		ID1 = 1
+		self.leftMotor = NanotecMotor(serialPort1,ID1)
+		
 	def calibratePosition(self):
 		"""Use to calibrate that absolute angular position of the nanotec-motor with the robot arm
 			
@@ -237,30 +277,214 @@ class ArmController:
 		print("Left Motor: " + str(leftAngleInDegrees))
 		
 		position = self.getPosition()
-		print("x: " +  str(position[0]) + "y: " + str(position[1]))
-		print("")	
+		print("x: " +  str(position[0]) + ", y: " + str(position[1]))
+		print("")   
 
 		
 	def printPositionInformationContinuously(self):
-		"""prints the angle of each motor in degrees"""
+		"""prints the angle of each motor in degrees
+		"""
 		while(True):
 			self.printPositionInformation()
 			time.sleep(1)
+	
+	def getJointAngles(self):
+		"""Returns the joint angles of the robot arm in radians
 		
-	def getPosition(self):
-		"""Returns the position of the robot arm in meters"""
-		rightAngleInDegrees = self.rightMotor.getAbsoluteAngularPosition()
+		Returns
+		(numpy.array of floats)
+			result[0]: left joint angle in radians
+			result[1]: right joint angle in radians
+		"""
 		leftAngleInDegrees = self.leftMotor.getAbsoluteAngularPosition()
+		rightAngleInDegrees = self.rightMotor.getAbsoluteAngularPosition()
 		
 		degreesToRadians = np.pi / 180.0
 		
-		rightAngleInRadians = rightAngleInDegrees * degreesToRadians
 		leftAngleInRadians = leftAngleInDegrees * degreesToRadians
+		rightAngleInRadians = rightAngleInDegrees * degreesToRadians
 		q1 = leftAngleInRadians
 		q2 = rightAngleInRadians
+		q = np.array([q1,q2])
+		return q
+
+	def getPosition(self):
+		"""Returns the position of the robot arm in meters
 		
-		position = self.forwardKinematics(q1,q2)
+			Returns:
+			(numpy.array of floats)
+				result[0] (float): x end effector position in meters
+				result[1] (float): y end effector position in meters
+		"""
+		q = self.getJointAngles()	
+		position = self.forwardKinematics(q)
 		return position
+		
+	def setPosition(self,r,speed=10):
+		"""moves robot arm to a particular position
+		
+		Parameters:
+		r (numpy.array of floats)
+			r[0] (float): x end effector position in meters
+			r[1] (float): y end effector position in meters
+		speed (float): speed for actuators to move in rpm (This will be changed later)
+		
+		Returns:
+		None
+		"""
+		jointAngles = self.inverseKinematics(r)
+		
+		radiansToDegrees = 180.0 / np.pi
+		leftAngleInDegrees = jointAngles[0] * radiansToDegrees
+		rightAngleInDegrees = jointAngles[1] * radiansToDegrees
+		self.rightMotor.setAbsoluteAngularPositionShortestPath(rightAngleInDegrees,speed)
+		self.leftMotor.setAbsoluteAngularPositionShortestPath(leftAngleInDegrees,speed)
+	
+	def getVelocity(self):
+		"""Returns the velocity of the robot arm in meters per second
+		
+			Returns:
+			(numpy.array of floats)
+				result[0] (float): x end effector velocity in meters per second
+				result[1] (float): y end effector velocity in meters per second
+		"""
+		rpmToRadPerSec = np.pi/30 # to convert rpm to radians per second
+		leftAngVel = self.leftMotor.getAngularVelocity() * rpmToRadPerSec
+		rightAngVel = self.rightMotor.getAngularVelocity() * rpmToRadPerSec
+		
+		qDot = np.array([leftAngVel,rightAngVel])
+		q = self.getJointAngles()
+		velocity = self.angularVelocityToVelocity(qDot,q)
+		return velocity
+	
+	def setVelocity(self,v):
+		"""moves robot arm at a particular velocity
+		
+		Parameters:
+		v (numpy.array of floats)
+			v[0] (float): x end effector velocity in meters per second
+			v[1] (float): y end effector velocity in meters per second
+		
+		Returns:
+		None
+		"""
+		radPerSecToRPM = 30 / np.pi
+		q = self.getJointAngles()
+		angularVelocity = self.velocityToAngularVelocity(v,q)
+		angularVelocityRPM = angularVelocity * radPerSecToRPM
+		
+		# set motor angular velocity in rpms using ints
+		print("angularVelocityRPM: " + str(list(angularVelocityRPM)))
+		self.leftMotor.setAngularVelocity(int( angularVelocityRPM[0] )) 
+		self.leftMotor.setAngularVelocity(int( angularVelocityRPM[1] ))   
+		
+	
+	def getForce(self):
+		"""Returns the force of the robot arm in Newtons
+		
+			Returns:
+			(numpy.array of floats)
+				result[0] (float): x end effector force in Newtons
+				result[1] (float): y end effector force in Newtons
+		"""
+		ratedCurrentToNm = 0.5/1000 # 0.1% rated current to holding torque Nm
+		leftTorque = self.leftMotor.getTorque() * ratedCurrentToNm
+		rightTorque = self.rightMotor.getTorque() * ratedCurrentToNm
+		
+		torque = np.array([leftTorque,rightTorque])
+		q = self.getJointAngles()
+		force = self.torqueToForce(torque,q)
+		return force
+	
+	def setForce(self,f):
+		"""
+		moves robot arm at a particular force
+		
+		Parameters:
+		v (numpy.array of floats)
+			f[0] (float): x end effector force in Newtons
+			f[1] (float): y end effector force in Newtons
+		
+		Returns:
+		None
+		"""
+		NmToRatedCurrent = 1000/0.5 # holding torque Nm to 0.1% rated current
+		q = self.getJointAngles()
+		# minus sign because robot arm is opposing force
+		torque = -self.forceToTorque(f,q) * NmToRatedCurrent # units of rated current
+		
+		# perform type conversion to int and set maximum threshold value
+		maxTorquePercent = 1000
+		torque[0] = min(torque[0],maxTorquePercent)
+		torque[1] = min(torque[1],maxTorquePercent)
+		torque[0] = max(torque[0],-maxTorquePercent)
+		torque[1] = max(torque[1],-maxTorquePercent)
+		
+		# perform type conversion to int and set torque
+		leftTorque = int(round(torque[0],-2))
+		rightTorque = int(round(torque[1],-2))
+		#print("torque: " + str([leftTorque,rightTorque]))
+		self.leftMotor.setTorque(leftTorque)
+		self.rightMotor.setTorque(rightTorque)
+	
+	def setImpedance(self,impedanceMatrix,referencePosition,referenceVelocity=0):
+		"""
+		moves robot arm at a particular impedance about a particular position
+		
+		Parameters:
+		impedanceMatrix (numpy.array of numpy.arrays of floats): numpy.array([[kx,bx],[ky,by]])
+			kx is the x end effector springyness in Newtons per meter
+			ky is the y end effector springyness in Newtons per meter
+			bx is the x end effector damping in Newtons per (meters per second)
+			by is the y end effector damping in Newtons per (meters per second)     
+		referencePosition (numpy.array of floats)
+			position[0] (float): x end effector position in meters
+			position[1] (float): y end effector position in meters
+			
+		Returns:
+		None
+		"""
+		currentPosition = self.getPosition()
+		deltaPosition = currentPosition - referencePosition
+		
+		currentVelocity = self.getVelocity()
+		deltaVelocity = currentVelocity - referenceVelocity
+		
+		# extract impedance parameters
+		kx = impedanceMatrix[0][0]
+		ky = impedanceMatrix[1][0]
+		bx = impedanceMatrix[0][1]
+		by = impedanceMatrix[1][1]
+		
+		# impedance control equations
+		fx = kx*deltaPosition[0] + bx*deltaVelocity[0]
+		fy = ky*deltaPosition[1] + by*deltaVelocity[1]
+		f = np.array([fx,fy])
+		
+		self.setForce(f)
+		
+	def setImpedanceAlongPath(path,impedanceFunction,epsilon):
+		""" Sets and impedance profile along a path
+			
+			Parameters:
+			path (list of numpy.arrays of floats)
+				path[0]: start position of path
+				path[1]: end position of path
+			impedanceFunction (function): function that returns an impedance matrix (numpy.array or numpy.arrays of floats) when called
+											This function can depend on both time and position and can take path as an argument.
+			epsilon: distance to path end that user
+		"""
+		K = impedanceFunction(path)
+		currentPosition = self.getPosition()
+		
+		# if reference position is below starting position
+		raise NotImplementedError
+		
+
+
+
+		
+	
 		
 		
 
@@ -271,7 +495,13 @@ class ArmController:
 
 def main():
 	arm = ArmController()
-	arm.printPositionInformationContinuously()
+	#arm.printPositionInformationContinuously()
+	
+	#import testKinematics
+	#testKinematics.main()
+	
+	import testPositionControl
+	testPositionControl.main()
 
 if __name__ == "__main__":
 	main()

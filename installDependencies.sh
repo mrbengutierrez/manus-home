@@ -10,8 +10,13 @@ sudo apt-get install python3-numpy # for arm controller
 sudo apt-get install python3-scipy # for arm controller
 sudo apt-get install python3-matplotlib # for arm controller
 
+# Have to build Nanotec c++ libraries
+cd robot_control/nanotec_motor/
+sudo bash BuildAllNanotecFiles.sh
+
 # Note: also have to install sysv_ipc located in nanotec-motor
-cd robot_controller/nanotec_motor/sysv_ipc-1.0.0
+
+cd sysv_ipc-1.0.0/
 sudo python setup.py install
 sudo python3 setup.py install
 
