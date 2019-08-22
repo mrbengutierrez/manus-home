@@ -301,6 +301,8 @@ class ArmController(Kinematics):
 		leftAngleInDegrees = self.leftMotor.getAbsoluteAngularPosition()
 		rightAngleInDegrees = self.rightMotor.getAbsoluteAngularPosition()
 		
+		# scale joint angles
+		
 		degreesToRadians = np.pi / 180.0
 		
 		leftAngleInRadians = leftAngleInDegrees * degreesToRadians

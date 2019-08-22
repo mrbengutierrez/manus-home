@@ -26,6 +26,7 @@
 // Global Constant Definitions
 #define VIRTUAL_TICKS_PER_REV 2000 // Number of virtual encoder ticks for 1 revolution.
 #define PHYSICAL_TICKS_PER_REV 4096 // Number of physical encoder ticks for 1 revolution.
+#define GEAR_RATIO 10 // gear ratio of the gearbox that is added.
 
 /**
  * Class that includes the definition of the global variables and the methods.
@@ -46,6 +47,10 @@ class NanotecMotor
     // ID number of the motor
     int _ID;   
     char* _serialPort;
+    
+    // for keeping track of multi-turn rotor configurations
+    int _initialEncoderValue;
+    int _encoderValueOffset;
     
     
   public:

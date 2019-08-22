@@ -1,3 +1,4 @@
+
 /**
  * Class NanotecMotor, code file with constructors and all methods.
  *
@@ -66,6 +67,10 @@ NanotecMotor::NanotecMotor(const char *serialPort, const int ID)
   
   // set motor revolutions = 1;
   _nanotec->writeCommand( (unsigned char *)"\x60\x8F\x02", 4, 1 );
+  
+  // Read the encoder, and set the initial encoder value
+  _initialEncoderValue = (int) _nanotec->readCommand( (unsigned char *)"\x60\x63\x00", 0, 0 );
+  _encoderValueOffset = 20000;
 }
 
 
@@ -422,7 +427,10 @@ int NanotecMotor::readPhysicalEncoder() {
  */
 double NanotecMotor::getAbsoluteAngularPosition() {
 	const double degreesPerRevolution = 360.0;
-	return (double) readPhysicalEncoder() * degreesPerRevolution / PHYSICAL_TICKS_PER_REV;
+	double encoderValue = (double) readPhysicalEncoder();
+	double scaled
+	double degrees = scaledEncoderValue* degreesPerRevolution / PHYSICAL_TICKS_PER_REV;
+	return degrees;
 }
 
 
