@@ -68,9 +68,21 @@ NanotecMotor::NanotecMotor(const char *serialPort, const int ID)
   // set motor revolutions = 1;
   _nanotec->writeCommand( (unsigned char *)"\x60\x8F\x02", 4, 1 );
   
-  // Read the encoder, and set the initial encoder value
-  _initialEncoderValue = (int) _nanotec->readCommand( (unsigned char *)"\x60\x63\x00", 0, 0 );
-  _encoderValueOffset = 20000;
+  
+  // NOTE THIS IS A HACK/PATCH
+  // The files listed only work for motors used by the Cheaper Manus Robot
+  // Read the encoder, and set the zero encoder value
+  if (ID == 0) {
+    std::string filename = "leftMotorCalibration.txt";
+    getCalibration(filename);
+  } else if (ID == 1) {
+    std::string filename = "rightMotorCalibration.txt";
+    getCalibration(filename);
+  } else {
+    cout << "Error line 82 Calibration Patch/Hack" << endl;
+    cout << "ID must be 0 or 1" << endl;
+    throw;
+  }
 }
 
 
@@ -390,7 +402,7 @@ int NanotecMotor::readPhysicalEncoder() {
   // Read the encoder.
   const int position = (int) _nanotec->readCommand( (unsigned char *)"\x60\x63\x00", 0, 0 );
   
-  return position%PHYSICAL_TICKS_PER_REV;
+  return position;
 }
 
 /**
@@ -426,11 +438,13 @@ int NanotecMotor::readPhysicalEncoder() {
  * 
  */
 double NanotecMotor::getAbsoluteAngularPosition() {
-	const double degreesPerRevolution = 360.0;
-	double encoderValue = (double) readPhysicalEncoder();
-	double scaled
-	double degrees = scaledEncoderValue* degreesPerRevolution / PHYSICAL_TICKS_PER_REV;
-	return degrees;
+  int currentEncoderValue = readPhysicalEncoder();
+  double deltaEncoderValue = (double) (currentEncoderValue - _zeroEncoderValue);
+  double physicalTicksPerRev = (double) PHYSICAL_TICKS_PER_REV;
+  double gearRatio = (double) GEAR_RATIO;
+  double degreesPerRev = 360.0;
+  double degrees = (deltaEncoderValue * degreesPerRev) / (physicalTicksPerRev * GEAR_RATIO);
+  return degrees;
 }
 
 
@@ -446,6 +460,8 @@ void NanotecMotor::stop()
   _nanotec->writeCommand( (unsigned char *)"\x60\x40\x00", 2, 0 );//(unsigned char *)"\x00\x02",  (unsigned char *)"\x06\x00" );
 }
 
+ 
+
 /**
  * Method to close the port of the serial communication.
  */
@@ -456,7 +472,57 @@ void NanotecMotor::closePort()
 
 
 
+/**
+ * Calibrates the motor's current position to the new one given
+ * 
+ * @param angPos angular position in degrees to set the current position to
+ * 		(0.0 <= angPos < 360.0)
+ * @param filename file to store calibration data.
+ */
+void NanotecMotor::setCalibration(double angPos, std::string filename) 
+{
+  // gets the motors current angulur position
+  int position = (int) _nanotec->readCommand( (unsigned char *)"\x60\x63\x00", 0, 0 );
+  
+  // get encoder value for a degree of zero degrees
+  double ticksPerRev = (double) PHYSICAL_TICKS_PER_REV;
+  double degreesPerRev = 360.0;
+  double gearRatio = (double) GEAR_RATIO;
+  double deltaTicksDouble = ticksPerRev * (angPos / degreesPerRev) * gearRatio;
+  _zeroEncoderValue = position - ((int) (deltaTicksDouble));
+  
+  std::string zeroEncoderValueString = std::to_string(_zeroEncoderValue);
+  
+  ofstream outputFile;  // output file stream object
+  outputFile.open(filename); // open file
+  outputFile << zeroEncoderValueString << endl; // write zero position encoder value to file
+  outputFile.close(); // close file
+}
 
+/** Extracts the calibration information from a file
+ * 
+ * @param filename name of file to extract calibration information from.
+ *        This file contains only one line. On that line is a string
+ *        that has value of the zero degree encoder value.
+ */
+ void NanotecMotor::getCalibration(std::string filename) 
+ {
+   ifstream inputFile; // input file stream object
+   inputFile.open(filename); // open file
+   
+   std::string zeroEncoderValueString; // string to store zero position encoder value
+   if (getline(inputFile,zeroEncoderValueString)) {
+     std::istringstream iss(zeroEncoderValueString); // create string stream object
+     iss >> _zeroEncoderValue; // convert string stream to int via stream.
+     
+   } else { // was unable to read line one of file
+     cout << "Error reading calibration from file" << endl;
+     cout << "Serial Port: " << _serialPort << endl;
+     cout << "ID: " << _ID << endl;
+     cout << "Calibration File: " << filename << endl;
+   }
+ 
+ }
 
 
 	

@@ -18,6 +18,13 @@
 //#include <unistd.h>
 #include <iostream>
 
+// for calibration functions
+#include <string>
+#include <fstream>
+#include <sstream>
+
+using namespace std;
+
 /**
  * Own libraries.
  */
@@ -49,8 +56,7 @@ class NanotecMotor
     char* _serialPort;
     
     // for keeping track of multi-turn rotor configurations
-    int _initialEncoderValue;
-    int _encoderValueOffset;
+    int _zeroEncoderValue;
     
     
   public:
@@ -92,6 +98,10 @@ class NanotecMotor
     
     // Method to close the serial port connection
     void closePort();
+    
+    // calibration functions
+    void setCalibration(double angPos, std::string filename);
+    void getCalibration(std::string filename);
 
 
   private:
