@@ -17,10 +17,10 @@ def printRobotInformation(arm):
 def testVelocityControl():
 	arm = ArmController()
 	while(True):
-		arm.setVelocity(np.array([0,0.5])) # m/s
+		arm.setVelocity(np.array([0,0.05])) # m/s
 		printRobotInformation(arm)
 		time.sleep(5)
-		arm.setVelocity(np.array([0,-0.5])) # m/s
+		arm.setVelocity(np.array([0,-0.05])) # m/s
 		printRobotInformation(arm)
 		time.sleep(5)
 		

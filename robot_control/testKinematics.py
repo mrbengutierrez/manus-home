@@ -11,8 +11,7 @@ email: bengutie@mit.edu
 import numpy as np
 import matplotlib.pylab as plt
 import scipy as sp
-
-import CheaperManusController.Kinematics as Kinematics
+from CheaperManusController import Kinematics as Kinematics
 
 
 class Graphics:
@@ -86,7 +85,10 @@ class TestKinematics:
 
     def testKinematics(self):
         """tests the kinematics of the arm simulator"""
-        qList = [(np.pi/2,np.pi/4), ((3/4)*np.pi,np.pi/4),  ((3/4)*np.pi,np.pi/2)]
+        degList = [(90.0,0.0), (135.0,45.0), (155.0,25.0), (180.0,90.0)]
+        degToRad = np.pi/180.0;
+        qList = [(tupleValue[0]*degToRad,tupleValue[1]*degToRad) for tupleValue in degList]
+        #qList = [(np.pi/2,np.pi/4), ((3/4)*np.pi,np.pi/4),  ((3/4)*np.pi,np.pi/2)]
         functionA = self.armSimulator.forwardKinematics
         functionB = self.armSimulator.inverseKinematics
         printStringList = ["forwardKinematics","inverseKinematics","joint angles","position"]

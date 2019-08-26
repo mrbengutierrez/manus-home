@@ -248,15 +248,21 @@ class ArmController(Kinematics):
 		#initialize kinematics
 		super().__init__()
 		
+		# calibrate motors before starting
+		import os
+		os.system("sudo ./nanotec_motor/calibrateMotors")
+		
 		# initialize right motor
 		serialPort0 = "/dev/ttyACM0"
 		ID0 = 0
 		self.rightMotor = NanotecMotor(serialPort0,ID0)
 		
+		
 		# initialize left motor
 		serialPort1 = "/dev/ttyACM1"
 		ID1 = 1
 		self.leftMotor = NanotecMotor(serialPort1,ID1)
+		
 		
 	def calibratePosition(self):
 		"""Use to calibrate that absolute angular position of the nanotec-motor with the robot arm
@@ -322,7 +328,7 @@ class ArmController(Kinematics):
 		position = self.forwardKinematics(q)
 		return position
 		
-	def setPosition(self,r,speed=10):
+	def setPosition(self,r,speed=3):
 		"""moves robot arm to a particular position
 		
 		Parameters:
@@ -512,8 +518,8 @@ def main():
 	#import testKinematics
 	#testKinematics.main()
 	
-	import testPositionControl
-	testPositionControl.main()
+	#import testPositionControl
+	#testPositionControl.main()
 
 if __name__ == "__main__":
 	main()

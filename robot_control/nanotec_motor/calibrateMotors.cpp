@@ -17,23 +17,23 @@
  
  int main() {
 	 
-	 // set up calibration for left motor
+	 // set up calibration for right motor
 	 int ID0 = 0;
 	 const char* serialPort0 = "/dev/ttyACM0";
-	 NanotecMotor* leftMotorPointer = new NanotecMotor(serialPort0,ID0);
-	 std::string leftMotorFile = "leftMotorCalibration.txt";
-	 double leftMotorCalibrationAngle = 0.0;
-	 leftMotorPointer->setCalibration(leftMotorCalibrationAngle,leftMotorFile);
-	 leftMotorPointer->closePort();
+	 NanotecMotor* rightMotorPointer = new NanotecMotor(serialPort0,ID0);
+	 std::string rightMotorFile = "rightMotorCalibration.txt";
+	 double rightMotorCalibrationAngle = 0.0;
+	 rightMotorPointer->setCalibration(rightMotorCalibrationAngle,rightMotorFile);
+	 rightMotorPointer->closePort();
 	 
 	 // set up calibration for right motor
 	 int ID1 = 1;
 	 const char* serialPort1 = "/dev/ttyACM1";
-	 NanotecMotor* rightMotorPointer = new NanotecMotor(serialPort1,ID1);
-	 std::string rightMotorFile = "rightMotorCalibration.txt";
-	 double rightMotorCalibrationAngle = 90.0;
-	 rightMotorPointer->setCalibration(rightMotorCalibrationAngle,rightMotorFile);
-	 rightMotorPointer->closePort();
+	 NanotecMotor* leftMotorPointer = new NanotecMotor(serialPort1,ID1);
+	 std::string leftMotorFile = "leftMotorCalibration.txt";
+	 double leftMotorCalibrationAngle = 90.0;
+	 leftMotorPointer->setCalibration(leftMotorCalibrationAngle,leftMotorFile);
+	 leftMotorPointer->closePort();
 	 
 	 return 0;
  }

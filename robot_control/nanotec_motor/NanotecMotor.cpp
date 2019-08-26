@@ -73,10 +73,10 @@ NanotecMotor::NanotecMotor(const char *serialPort, const int ID)
   // The files listed only work for motors used by the Cheaper Manus Robot
   // Read the encoder, and set the zero encoder value
   if (ID == 0) {
-    std::string filename = "leftMotorCalibration.txt";
+    std::string filename = "rightMotorCalibration.txt";
     getCalibration(filename);
   } else if (ID == 1) {
-    std::string filename = "rightMotorCalibration.txt";
+    std::string filename = "leftMotorCalibration.txt";
     getCalibration(filename);
   } else {
     cout << "Error line 82 Calibration Patch/Hack" << endl;
@@ -292,7 +292,7 @@ void NanotecMotor::setRelativeAngularPosition( double angPos, int angVel )
   }
   
   // convert degrees to encoderTicks
-  int angPosTicks = degreesToVirtualEncoderTicks(angPos);
+  int angPosTicks = degreesToVirtualEncoderTicks(angPos) * GEAR_RATIO;
 
   // Negatives case. -1 is FFFF, -2 FFFE, ...
   if ( angVel < 0 ){ angVel += 65536; } // negative vel + FFFF + 1
@@ -497,6 +497,8 @@ void NanotecMotor::setCalibration(double angPos, std::string filename)
   outputFile.open(filename); // open file
   outputFile << zeroEncoderValueString << endl; // write zero position encoder value to file
   outputFile.close(); // close file
+  cout << "NanotecMotor with serialport " << _serialPort << " calibrated" << endl;
+
 }
 
 /** Extracts the calibration information from a file
@@ -511,16 +513,29 @@ void NanotecMotor::setCalibration(double angPos, std::string filename)
    inputFile.open(filename); // open file
    
    std::string zeroEncoderValueString; // string to store zero position encoder value
-   if (getline(inputFile,zeroEncoderValueString)) {
+   while( getline(inputFile,zeroEncoderValueString) )
+   {
      std::istringstream iss(zeroEncoderValueString); // create string stream object
      iss >> _zeroEncoderValue; // convert string stream to int via stream.
+     cout << "NanotecMotor with serialport " << _serialPort << " calibration file received" << endl;
+     cout << "joint angle (deg): " << this->getAbsoluteAngularPosition() << endl;
+   }
+   /*
+   bool isCalibrationAvailable = getline(inputFile,zeroEncoderValueString);
+   cout << "isCalibrationAvailable: " << isCalibrationAvailable << endl;
+   if (isCalibrationAvailable) {
+     std::istringstream iss(zeroEncoderValueString); // create string stream object
+     iss >> _zeroEncoderValue; // convert string stream to int via stream.
+     cout << "NanotecMotor with serialport " << _serialPort << " calibration file received" << endl;
      
    } else { // was unable to read line one of file
-     cout << "Error reading calibration from file" << endl;
-     cout << "Serial Port: " << _serialPort << endl;
-     cout << "ID: " << _ID << endl;
-     cout << "Calibration File: " << filename << endl;
+     cout << "NanotecMotor with serialport " << _serialPort << " not calibrated" << endl;
+     //cout << "Error reading calibration from file" << endl;
+     //cout << "Serial Port: " << _serialPort << endl;
+     //cout << "ID: " << _ID << endl;
+     //cout << "Calibration File: " << filename << endl;
    }
+   */
  
  }
 
