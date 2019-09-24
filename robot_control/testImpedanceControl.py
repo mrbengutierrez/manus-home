@@ -14,9 +14,9 @@ def printRobotInformation(arm):
 
 def testForceControl():
 	arm = ArmController()
-	kx = 50.0
+	kx = 100.0
 	bx = 500.0
-	ky = 50.0
+	ky = 100.0
 	by = 500.0
 	K = np.array([[kx,bx],[ky,by]])
 	

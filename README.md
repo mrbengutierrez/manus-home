@@ -3,7 +3,8 @@ Rehabiltation games for 77 lab
 
 
 #### About
-This repository contains the newer version python rehabilitation games. 
+This repository contains the newer version python rehabilitation games.
+It has the games + a robot controller. 
 
 #### Completed
 * Develop a python to c++ interface for the c++ NanotecMotor class
