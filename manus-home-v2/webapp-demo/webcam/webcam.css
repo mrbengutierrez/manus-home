@@ -1,0 +1,17 @@
+#container {
+	margin: 0px auto;
+	width: 100px;
+	height: 75px;
+	border: 10px #333 solid;
+	z-index: 2;
+	display: block;
+	position: fixed;
+}
+#videoElement {
+	width: 100px;
+	height: 75px;
+	background-color: #666;
+	display: block;
+	z-index: 2;
+	position: fixed;
+}

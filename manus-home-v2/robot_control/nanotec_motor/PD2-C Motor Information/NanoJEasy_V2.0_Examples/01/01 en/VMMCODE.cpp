@@ -1,0 +1,51 @@
+//in this example the operationmode will be set to velocity mode and the state machine will be switched on
+
+//1. Step: mapping the frequently used SDO´s
+
+map U16 ControlWord as output 0x6040:00
+map S08 OperationMode as output 0x6060:00
+map S16 TargetVelocity as output 0x6042:00
+
+#include "wrapper.h"
+
+
+//2. Step: call main function and set the speed and mode of operation
+
+void user()
+{
+	
+	//sleep(5000);                      // wait 5000 ms (optional if needed)
+	Out.OperationMode = 2;				// set the mode of operation to velocity mode (with mapping, line 5-7)
+	//od_write(0x6060,0x00, 2);			// would also set the mode of operation to velocity mode (without mapping, line 5-7)
+		
+	Out.TargetVelocity = 200;			// set the target velocity to 200 rpm (basicvalue)(with mapping, line 5-7)
+	//od_write(0x6042,0x00, 200);		// set the target velocity to 200 rpm (basicvalue)(without mapping, line 5-7)
+		
+//3. Step: switch on the state machine 
+
+	Out.ControlWord = 0x6;				// switch to the "enable voltage" state
+	do 	{
+		yield();						// waiting for the next cycle (1ms)
+		}
+		while ( (od_read(0x6041, 0x00) & 0xEF) != 0x21);   // wait until drive is in state "enable voltage"
+	
+	// checking the statusword (0x6041) for the bitmask: xxxx xxxx x01x 0001
+	
+	Out.ControlWord = 0x7;				// switch to the "switched on" state
+	do 	{
+		yield();						// waiting for the next cycle (1ms)
+		}
+		while ( (od_read(0x6041, 0x00) & 0xEF) != 0x23);   // wait until drive is in state "switched on"	
+	// checking the statusword (0x6041) for the bitmask: xxxx xxxx x01x 0011	
+		
+	Out.ControlWord = 0xF;				// switch to the "enable operation" state and starts the velocity mode
+	do 	{
+		yield();						// waiting for the next cycle (1ms)
+		}
+		while ( (od_read(0x6041, 0x00) & 0xEF) != 0x27);   // wait until drive is in state "operation enabled"	
+	// checking the statusword (0x6041) for the bitmask: xxxx xxxx x01x 0111	
+		
+	while(true)							// endless loop
+	{yield();}	                      	// waiting for the next cycle (1ms)
+		
+}	
