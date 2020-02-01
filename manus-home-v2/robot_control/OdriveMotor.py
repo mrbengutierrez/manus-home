@@ -148,19 +148,20 @@ class OdriveMotor:
 			Returns:
 			nothing
 		"""
+		# create variable to represent odrive axis
+		self.axis = motor
+		
 		# set transmission gear ratio
 		self.gearRatio = GEAR_RATIO
 		
 		# set initial position value
-		self.setpointPerRev = ENCODER_TICKS_PER_REV
+		self.encoderTickPerRev = ENCODER_TICKS_PER_REV
 		
 		# set the offset setpoint referencing from zero degrees
-		self.setpointOffset = int(0) # initialize offset setpoint
+		self.encoderTickOffset = int(0) # initialize offset encoder tick
 		self.calibrateAngularPosition(initialPosition)
 		
 		
-		# use closed loop control
-		self.axis = motor
 
 	
 	def torqueMode(self,torque = 0, maxTorque = 1000, maxCurr = 1800, nomCurr = 1800, slope = 1000):
@@ -178,16 +179,17 @@ class OdriveMotor:
 		"""
 		raise NotImplementedError
 	
-	def angularVelocityMode(self,angVel = 0):
+	def angularVelocityMode(self):
 		"""Method to activate the angular velocity control
 		
 			Parameters:
-			angVel (int): angualr velocity in rpm
+			None
 			
 			Returns:
 			None
 		"""
-		raise NotImplementedError
+		self.axis.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+		self.axis.controller.config.control_mode = CTRL_MODE_VELOCITY_CONTROL
 		
 	def angularPositionMode(self):
 		"""Method to activate the angular position control
@@ -200,6 +202,7 @@ class OdriveMotor:
 		"""
 		# use closed loop control
 		self.axis.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+		self.axis.controller.config.control_mode = CTRL_MODE_POSITION_CONTROL
 		return
 	
 	def setTorque(self, torque):
@@ -221,12 +224,16 @@ class OdriveMotor:
 		"""Method to change the angular velocity value in real time
 		
 			Parameters:
-			angVel (int): Angular velocity in rpm
+			angVel (float): Angular velocity in rpm
 			
 			Returns
 			None
 		"""
-		raise NotImplementedError
+		minPerSec = 1/60
+		#convert from rpm to count/sec
+		scaledAngularVelocity = angVel*minPerSec*self.encoderTickPerRev*self.gearRatio # counts/sec
+		scaledAngularVelocity = int(scaledAngularVelocity) # setpoint must be int
+		self.axis.controller.vel_setpoint = scaledAngularVelocity
 	
 	def setRelativeAngularPosition(self, angPos, angVel = 200):
 		"""Method to change the relative angular position value in real time. 
@@ -241,10 +248,9 @@ class OdriveMotor:
 			None
 		"""
 		
-		setpoint = self._getSetpoint()
-		relativeSetpoint = self._degreesToSetpoint(angPos)
-		newSetpoint = setpoint + relativeSetpoint
-		self._setSetpoint(newSetpoint)
+		encoderTick = self._getEncoderTick()
+		relativeEncoderTick = self._degreesToEncoderTicks(angPos)
+		newSetpoint = encoderTick + relativeEncoderTick
 		self._setSetpoint(newSetpoint)
 		return
 		
@@ -321,9 +327,14 @@ class OdriveMotor:
 		"""Returns the current angular velocity in rpm
 		
 			Returns:
-			int: current angular velocity in rpm
+			float: current angular velocity in rpm
 		"""
-		raise NotImplementedError
+		measuredAngularVelocity = self.axis.encoder.vel_estimate # counts/sec
+		secPerMin = 60
+		#convert from count/s to rpm
+		scaledAngularVelocity = measuredAngularVelocity*secPerMin/(self.encoderTickPerRev*self.gearRatio)
+		scaledAngularVelocity = float(scaledAngularVelocity)
+		return scaledAngularVelocity
 	
 	def getAbsoluteAngularPosition(self):
 		"""Returns the absolute angular position of the motor shaft in degrees
@@ -332,9 +343,12 @@ class OdriveMotor:
 			double: absolute angular position of the motor shaft in degrees
 					(0.0 <= output < 360.0)
 		"""
-		setpoint = self._getSetpoint()
-		deltaSetpoint = setpoint - self.setpointOffset
-		degrees = self._setpointToDegrees(deltaSetpoint)
+		encoderTick = self._getEncoderTick()
+		deltaEncoderTick = encoderTick - self.encoderTickOffset
+		degrees = self._encoderTickToDegrees(deltaEncoderTick)
+		
+		#print("encoderTick: " + str(encoderTick))
+		#print("self.encoderTickOffset: " + str(self.encoderTickOffset))
 		return degrees
 
 	
@@ -355,28 +369,30 @@ class OdriveMotor:
 			Returns:
 			None
 		"""
-		self.setpointOffset = self._degreesToSetpoint(specifiedAngularPosition)
+		encoderTick = self._getEncoderTick()
+		specifiedEncoderTick = self._degreesToEncoderTicks(specifiedAngularPosition)
+		self.encoderTickOffset = encoderTick - specifiedEncoderTick
 		return
 
 
 	# Private Methods ---
 	
-	def _setpointToDegrees(self, setpoint):
-		""" Converts setpoint to degrees 
+	def _encoderTickToDegrees(self, encoderTick):
+		""" Converts encoder tick to degrees 
 		
 			Parameters:
-			setpoint (int): current setpoint of the motor
+			encoderTick (int): current encoder tick of the motor
 			
 			Returns:
 			(float): current angle of the secondary or output shaft of the
 			         transmission in degrees
 		"""
 		degreesPerRevolution = 360.0
-		degrees = float( degreesPerRevolution*setpoint / (self.setpointPerRev*self.gearRatio) )
+		degrees = float( degreesPerRevolution*encoderTick / (self.encoderTickPerRev*self.gearRatio) )
 		return degrees
 	
-	def _degreesToSetpoint(self, degrees):
-		""" Converts setpoint to degrees 
+	def _degreesToEncoderTicks(self, degrees):
+		""" Converts encoder tick to degrees 
 		
 			Parameters:
 			degrees (float): current angle of the secondary or output shaft of the
@@ -386,8 +402,8 @@ class OdriveMotor:
 			(int):  current setpoint of the motor
 		"""
 		degreesPerRevolution = 360.0
-		setpoint = int( degrees*self.setpointPerRev*self.gearRatio / degreesPerRevolution )
-		return setpoint	
+		encoderTick = int( degrees*self.encoderTickPerRev*self.gearRatio / degreesPerRevolution )
+		return encoderTick
 		
 	def _setSetpoint(self, setpoint):
 		""" Sets the new setpoint of the motor
@@ -398,7 +414,6 @@ class OdriveMotor:
 			Returns:
 			None
 		"""
-		#print("set setpoint: " + str(setpoint))
 		setpoint = int(setpoint)
 		self.axis.controller.pos_setpoint = setpoint
 		
@@ -409,10 +424,9 @@ class OdriveMotor:
 			None
 			
 			Returns:
-			(int): current setpoint of the motor
+			(int): current encoder tick of the motor
 		"""
-		#print("get setpoint: " + str(self.axis.controller.pos_setpoint))
-		return self.axis.controller.pos_setpoint
+		return self.axis.encoder.pos_estimate
 	
 	@staticmethod
 	def _sign(value):
@@ -431,47 +445,7 @@ class OdriveMotor:
 
 
 def main():
-	motorController = OdriveController()
-	#motorController.calibrate()
-	[leftMotor,rightMotor] = motorController.getMotors()
-	
-	import time
-	print("")
-	
-	leftMotor.angularPositionMode()
-	
-	print("Testing setRelativeAngularPosition(90.0)")
-	print(leftMotor.getAbsoluteAngularPosition())
-	leftMotor.setRelativeAngularPosition(90.0)
-	time.sleep(5)
-	
-	print("Testing setRelativeAngularPosition(-90.0)")
-	print(leftMotor.getAbsoluteAngularPosition())
-	leftMotor.setRelativeAngularPosition(-90.0)
-	time.sleep(5)
-	
-	print('Testing setAbsoluteAngularPosition(angPos=180.0, direction="counter-clockwise")')
-	print(leftMotor.getAbsoluteAngularPosition())	
-	leftMotor.setAbsoluteAngularPosition(angPos=180.0, direction="counter-clockwise")
-	time.sleep(5)
-
-	print('Testing setAbsoluteAngularPosition(angPos=90.0, direction="clockwise")')
-	print(leftMotor.getAbsoluteAngularPosition())	
-	leftMotor.setAbsoluteAngularPosition(angPos=90.0, direction="clockwise")
-	time.sleep(5)	
-	
-	print("Testing setAbsoluteAngularPositionShortestPath(angPos=270.0)")
-	print(leftMotor.getAbsoluteAngularPosition())	
-	leftMotor.setAbsoluteAngularPositionShortestPath(angPos=270.0)
-	time.sleep(5)
-	
-	print("Testing setAbsoluteAngularPositionShortestPath(angPos=0.0)")
-	print(leftMotor.getAbsoluteAngularPosition())	
-	leftMotor.setAbsoluteAngularPositionShortestPath(angPos=0.0)
-	time.sleep(5)	
-	
-	print(leftMotor.getAbsoluteAngularPosition())	
-	leftMotor.stop()
+	pass # do nothing
 
 
 if __name__ == "__main__":
