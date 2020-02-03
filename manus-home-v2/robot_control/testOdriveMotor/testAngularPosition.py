@@ -21,88 +21,164 @@ def testAngularPosition():
 	"""Tests the angular position of the odrive motor"""
 	
 	motorController = OdriveController()
-	#motorController.calibrate()
+	motorController.calibrate()
 	[leftMotor,rightMotor] = motorController.getMotors()
 	
 	import time
+	shortDelay = 2
+	longDelay = 7
 	print("")
 	
 	print("Testing Left Motor")
 	
 	print(leftMotor.getAbsoluteAngularPosition())
-	print("Setting Angular Position Mode")
-	leftMotor.angularPositionMode()
-	print(leftMotor.getAbsoluteAngularPosition())
 
+	print("")
 	print("Testing setRelativeAngularPosition(90.0)")
 	leftMotor.setRelativeAngularPosition(90.0)
-	time.sleep(5)
+	time.sleep(shortDelay)
 	print(leftMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)
 	
+	print("")
 	print("Testing setRelativeAngularPosition(-90.0)")
 	leftMotor.setRelativeAngularPosition(-90.0)
-	time.sleep(5)
+	time.sleep(shortDelay)
 	print(leftMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)
 	
+	print("")
 	print('Testing setAbsoluteAngularPosition(angPos=180.0, direction="counter-clockwise")')
 	leftMotor.setAbsoluteAngularPosition(angPos=180.0, direction="counter-clockwise")
-	time.sleep(5)
+	time.sleep(shortDelay)
 	print(leftMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)
 
-	print('Testing setAbsoluteAngularPosition(angPos=90.0, direction="clockwise")')	
-	leftMotor.setAbsoluteAngularPosition(angPos=90.0, direction="clockwise")
-	time.sleep(5)
-	print(leftMotor.getAbsoluteAngularPosition())	
-	
+	print("")
+	print('Testing setAbsoluteAngularPosition(angPos=0.0, direction="clockwise")')	
+	leftMotor.setAbsoluteAngularPosition(angPos=0.0, direction="clockwise")
+	time.sleep(shortDelay)
+	print(leftMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)	
+
+	print("")	
 	print("Testing setAbsoluteAngularPositionShortestPath(angPos=270.0)")	
 	leftMotor.setAbsoluteAngularPositionShortestPath(angPos=270.0)
-	time.sleep(5)
+	time.sleep(shortDelay)
 	print(leftMotor.getAbsoluteAngularPosition())
-	
+	time.sleep(longDelay)
+
+	print("")	
 	print("Testing setAbsoluteAngularPositionShortestPath(angPos=0.0)")
 	leftMotor.setAbsoluteAngularPositionShortestPath(angPos=0.0)
-	time.sleep(5)
-	print(leftMotor.getAbsoluteAngularPosition())	
+	time.sleep(shortDelay)
+	print(leftMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)	
+
+	print("")	
+	print("Testing setAbsoluteAngularPositionShortestPath(angPos=90.0)")	
+	leftMotor.setAbsoluteAngularPositionShortestPath(angPos=90.0)
+	time.sleep(shortDelay)
+	print(leftMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)
+
+	print("")	
+	print("Testing setAbsoluteAngularPositionShortestPath(angPos=0.0)")
+	leftMotor.setAbsoluteAngularPositionShortestPath(angPos=0.0)
+	time.sleep(shortDelay)
+	print(leftMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)		
+
+	print("")	
+	print("Testing setAbsoluteAngularPositionShortestPath(angPos=-90.0)")	
+	leftMotor.setAbsoluteAngularPositionShortestPath(angPos=-90.0)
+	time.sleep(shortDelay)
+	print(leftMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)
+
+	print("")	
+	print("Testing setAbsoluteAngularPositionShortestPath(angPos=0.0)")
+	leftMotor.setAbsoluteAngularPositionShortestPath(angPos=0.0)
+	time.sleep(shortDelay)
+	print(leftMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)	
 	
 	leftMotor.stop()
 	
 	print("Testing Right Motor")
 	
 	print(rightMotor.getAbsoluteAngularPosition())
-	print("Setting Angular Position Mode")
-	rightMotor.angularPositionMode()
-	print(rightMotor.getAbsoluteAngularPosition())
 
+	print("")
 	print("Testing setRelativeAngularPosition(90.0)")
 	rightMotor.setRelativeAngularPosition(90.0)
-	time.sleep(5)
+	time.sleep(shortDelay)
 	print(rightMotor.getAbsoluteAngularPosition())
-	
+	time.sleep(longDelay)
+
+	print("")	
 	print("Testing setRelativeAngularPosition(-90.0)")
 	rightMotor.setRelativeAngularPosition(-90.0)
-	time.sleep(5)
+	time.sleep(shortDelay)
 	print(rightMotor.getAbsoluteAngularPosition())
-	
+	time.sleep(longDelay)
+
+	print("")	
 	print('Testing setAbsoluteAngularPosition(angPos=180.0, direction="counter-clockwise")')
 	rightMotor.setAbsoluteAngularPosition(angPos=180.0, direction="counter-clockwise")
-	time.sleep(5)
+	time.sleep(shortDelay)
 	print(rightMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)
 
-	print('Testing setAbsoluteAngularPosition(angPos=90.0, direction="clockwise")')	
-	rightMotor.setAbsoluteAngularPosition(angPos=90.0, direction="clockwise")
-	time.sleep(5)
-	print(rightMotor.getAbsoluteAngularPosition())	
-	
+	print("")
+	print('Testing setAbsoluteAngularPosition(angPos=0.0, direction="clockwise")')	
+	rightMotor.setAbsoluteAngularPosition(angPos=0.0, direction="clockwise")
+	time.sleep(shortDelay)
+	print(rightMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)
+
+	print("")	
 	print("Testing setAbsoluteAngularPositionShortestPath(angPos=270.0)")	
 	rightMotor.setAbsoluteAngularPositionShortestPath(angPos=270.0)
-	time.sleep(5)
+	time.sleep(shortDelay)
 	print(rightMotor.getAbsoluteAngularPosition())
-	
+	time.sleep(longDelay)
+
+	print("")	
 	print("Testing setAbsoluteAngularPositionShortestPath(angPos=0.0)")
 	rightMotor.setAbsoluteAngularPositionShortestPath(angPos=0.0)
-	time.sleep(5)
-	print(rightMotor.getAbsoluteAngularPosition())	
-	
+	time.sleep(shortDelay)
+	print(rightMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)
+
+	print("")	
+	print("Testing setAbsoluteAngularPositionShortestPath(angPos=90.0)")	
+	rightMotor.setAbsoluteAngularPositionShortestPath(angPos=90.0)
+	time.sleep(shortDelay)
+	print(rightMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)
+
+	print("")	
+	print("Testing setAbsoluteAngularPositionShortestPath(angPos=0.0)")
+	rightMotor.setAbsoluteAngularPositionShortestPath(angPos=0.0)
+	time.sleep(shortDelay)
+	print(rightMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)	
+
+	print("")	
+	print("Testing setAbsoluteAngularPositionShortestPath(angPos=-90.0)")	
+	rightMotor.setAbsoluteAngularPositionShortestPath(angPos=-90.0)
+	time.sleep(shortDelay)
+	print(rightMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)
+
+	print("")	
+	print("Testing setAbsoluteAngularPositionShortestPath(angPos=0.0)")
+	rightMotor.setAbsoluteAngularPositionShortestPath(angPos=0.0)
+	time.sleep(shortDelay)
+	print(rightMotor.getAbsoluteAngularPosition())
+	time.sleep(longDelay)	
+		
 	rightMotor.stop()
 
 

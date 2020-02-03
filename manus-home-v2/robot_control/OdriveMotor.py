@@ -7,14 +7,23 @@ The motor that was used was a
 
 Author: Benjamin Gutierrez
 Email: mrbengutierrez@gmail.com
-Date: 02/01/2020
+Date: 02/03/2020
 
 
 """
 
-
+# import odrive libraries for motor controller
 import odrive
 from odrive.enums import *
+
+import enum # for control modes
+
+class ControlMode(enum.Enum):
+	""" Enumeration for specifying control mode that OdriveMotor is in"""
+	Off = 0
+	AngularPosition = 1
+	AngularVelocity = 2
+	Torque = 3
 
 
 # gear ratio of the actuation module
@@ -62,7 +71,7 @@ class OdriveController:
 		for axis in self.motors:
 
 			# Set current limit
-			axis.motor.config.current_lim = 20 # Amps
+			axis.motor.config.current_lim = 40 # Amps
 			
 			# Set velocity limit
 			#self.my_drive.axis0.motor.config.vel_limit = 100 # counts/s
@@ -214,70 +223,37 @@ class OdriveMotor:
 		self.calibrateAngularPosition(initialPosition)
 
 		# set maximum angular velocity
-		maxAngularVelocity = 300 # rpm
+		maxAngularVelocity = 100 # rpm
 		self._setMaxAngularVelocity(maxAngularVelocity)	
 		
 		# allow larger speed limit violations to prevent error codes
 		self.axis.controller.config.vel_limit_tolerance = 4
 		
+		# make sure motor is stopped
+		self.stop()
+		
+		#set control mode to off
+		self.controlMode = ControlMode.Off
+		
 
 	
-	def torqueMode(self,torque = 0, maxTorque = 1000, maxCurr = 1800, nomCurr = 1800, slope = 1000):
-		"""Method to activate the Profile Torque or torque profile.
-		
-			Parameters:
-			torque (int):  Torque value in percentage (decimal value 0-1000=100%)
-			maxTorque (int):  Maximum torque in percentage (decimal value 0-1000=100%)
-			maxCurr (int):  Maximum current, commonly 1800 mA
-			nomCurr (int):  Nominal current, commonly 1800 mA
-			slope (int): Slope to arrive to the torque, 1000 means go directly
-			
-			Returns:
-			None
-		"""
-		raise NotImplementedError
-	
-	def angularVelocityMode(self):
-		"""Method to activate the angular velocity control
-		
-			Parameters:
-			None
-			
-			Returns:
-			None
-		"""
-		self.axis.controller.config.control_mode = CTRL_MODE_VELOCITY_CONTROL
-		self.axis.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-		return
-		
-	def angularPositionMode(self):
-		"""Method to activate the angular position control
-			
-			Parameters:
-			None
-			
-			Returns:
-			None
-		"""
-		# use closed loop control
-		self.axis.controller.config.control_mode = CTRL_MODE_POSITION_CONTROL
-		self.axis.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-		return
+
 	
 	def setTorque(self, torque):
 		"""Method to activate the Profile Torque or torque profile.
 
 			Parameters:
-			torque (int): Torque value in percentage (decimal value 0-1000=100%)
-			maxTorque (int):  Maximum torque in percentage (decimal value 0-1000=100%)
-			maxCurr (int): Maximum current, commonly 1800 mA
-			nomCurr (int):  Nominal current, commonly 1800 mA
-			slope (int): Slope to arrive to the torque, 1000 means go directly
-			
+			torque (float): Torque value in percentage (decimal value 0-1000=100%)
 			Returns:
 			None
 		"""
-		raise NotImplementedError
+		# make sure we are are in torque control mode
+		if self.controlMode != ControlMode.Torque:
+			self._torqueMode()
+		
+		# set the torque
+		current = self._torqueToCurrent(torque)
+		self.axis.controller.current_setpoint = current
 	
 	def setAngularVelocity(self, angVel):
 		"""Method to change the angular velocity value in real time
@@ -288,6 +264,11 @@ class OdriveMotor:
 			Returns
 			None
 		"""
+		# make sure we are in angular velocity control mode
+		if self.controlMode != ControlMode.AngularVelocity:
+			self._angularVelocityMode()
+		
+		# set the angular velocity
 		scaledAngularVelocity = self._rpmToCountsPerSec(angVel) # counts/sec, int
 		self.axis.controller.vel_setpoint = scaledAngularVelocity
 	
@@ -296,7 +277,8 @@ class OdriveMotor:
 			The position is set using the current position as the zero position.
 			
 			Parameters:
-			angPos (double): angular position value in degrees (negative to reverse direction)
+			angPos (double): angular position value in degrees 
+							positive for counter-clockwise direction, negative for clockwise direction
 							(-360.0 <= angPos <= 360.0)
 			angVel (int): angular velocity value in rpm (must always be positive)
 			
@@ -305,6 +287,10 @@ class OdriveMotor:
 		"""
 		# set the maximum planned angular velocity
 		self._setMaxAngularVelocity(angVel)
+			
+		# make sure we are in angular position control mode
+		if self.controlMode != ControlMode.AngularPosition:
+			self._angularPositionMode()
 		
 		# set relative angular position
 		encoderTick = self._getEncoderTick()
@@ -318,7 +304,7 @@ class OdriveMotor:
 		
 			Parameters:
 			angPos (double): angular position value in degrees (must always be positive)
-						(0 <= angPos <= 360.0)
+						(0 <= angPos < 360.0)
 			angVel (int): angular velocity value in rpm (must always be positive)
 			direction (string): direction that motor should rotate
 								can be "counter-clockwise" or "clockwise" only
@@ -327,24 +313,30 @@ class OdriveMotor:
 			None
 		"""
 		# set the maximum planned angular velocity
-		self._setMaxAngularVelocity(angVel)
+		self._setMaxAngularVelocity(angVel)		
 		
-		#set sign of angPos
-		if direction == "clockwise":
-			angPos = -angPos
+		# make sure we are in angular position control mode
+		if self.controlMode != ControlMode.AngularPosition:
+			self._angularPositionMode()
 		
-		currentPosition = self.getAbsoluteAngularPosition()
 		degreesPerRevolution = 360.0
-			
-		positiveAngularPosition = angPos * OdriveMotor._sign(angPos)
-			
-		# deltaPosition is the difference between target position and current position
-		deltaPosition = (positiveAngularPosition - currentPosition) * OdriveMotor._sign(angPos)
-		if (deltaPosition < 0.0):
-			 deltaPosition += degreesPerRevolution # make sure deltaPosition < 360.0 degrees
-		deltaPosition *= OdriveMotor._sign(angPos) # account for direction of rotation
-	
-		self.setRelativeAngularPosition( deltaPosition, angVel )
+		currentPosition = self.getAbsoluteAngularPosition()
+		deltaPosition = angPos - currentPosition
+		
+		relativePosition = None # initialize relativePosition
+		if direction == "counter-clockwise":
+			if deltaPosition >= 0.0:
+				relativePosition = deltaPosition
+			else: # deltaPosition < 0.0
+				relativePosition = deltaPosition + degreesPerRevolution
+		
+		if direction == "clockwise":
+			if deltaPosition >= 0.0:
+				relativePosition = -deltaPosition + degreesPerRevolution
+			else: # deltaPosition < 0.0
+				relativePosition = deltaPosition
+		
+		self.setRelativeAngularPosition(relativePosition, angVel)
 		return
 		
 	
@@ -354,20 +346,58 @@ class OdriveMotor:
 			
 			Parameters:
 			angPos (double): angular position value in degrees (must always be positive)
-							(0.0 <= angPos <= 360.0)
+							(-360.0 < angPos < 360.0)
 			angVel (int): angular velocity value in rpm (must always be positive)
 			
 			Returns:
 			None
 		"""
+
 		# set the maximum planned angular velocity
-		self._setMaxAngularVelocity(angVel)
+		self._setMaxAngularVelocity(angVel)		
 		
+		# make sure we are in angular position control mode
+		if self.controlMode != ControlMode.AngularPosition:
+			self._angularPositionMode()
+								
+		# degrees per revolution
+		degreesPerRotation = 360.0		
 		
+		# bound angular position in range 0.0 - 360.0 degrees
+		angPos = OdriveMotor._boundAngle(angPos)
+		print("angPos given: " + str(angPos)) # for debugging
+			
 		# set angular position
 		currentPosition = self.getAbsoluteAngularPosition()
 		deltaPosition = angPos - currentPosition
-		self.setRelativeAngularPosition(deltaPosition)
+		
+		relativePosition = None
+		# case 1: rotate clockwise
+		if deltaPosition > 0.0 and abs(deltaPosition) >= degreesPerRotation/2:
+			relativePosition = -abs(degreesPerRotation - deltaPosition) # clockwise
+			print("case 1") # for debugging
+			
+		# case 2: rotate clockwise
+		elif deltaPosition < 0.0 and abs(deltaPosition) <= degreesPerRotation/2:
+			relativePosition = -abs(deltaPosition) # clockwise
+			print("case 2") # for debugging
+
+		# case 3: rotate counter-clockwise
+		elif deltaPosition < 0.0 and abs(deltaPosition) >= degreesPerRotation/2:
+			relativePosition = abs(degreesPerRotation + deltaPosition) # counter-clockwise
+			print("case 3") # for debugging
+			
+		# case 4: rotate counter-clockwise
+		elif deltaPosition > 0.0 and abs(deltaPosition) <= degreesPerRotation/2:
+			relativePosition = abs(deltaPosition) # counter-clockwise		
+			print("case 4") # for debugging
+			
+		else:
+			raise RuntimeError("position difference did not meet any cases")
+		
+		
+		self.setRelativeAngularPosition(relativePosition, angVel)
+		
 		return
 	
 	def stop(self):
@@ -378,6 +408,8 @@ class OdriveMotor:
 		"""
 		# Disable motor PWM and do nothing
 		self.axis.requested_state = AXIS_STATE_IDLE 
+		self.controlMode = ControlMode.Off
+		return
 	
 	def getTorque(self):
 		"""Returns the torque as thousandths of the torque
@@ -387,7 +419,9 @@ class OdriveMotor:
 				 e.g., the value "500" means "50%" of the rated torque;
 				 (0 <= value <= 1000)
 		"""
-		raise NotImplementedError
+		current = self.axis.motor.current_control.Iq_measured
+		torque = self._torqueToCurrent(current)
+		return torque
 	
 	def getAngularVelocity(self):
 		"""Returns the current angular velocity in rpm
@@ -409,7 +443,10 @@ class OdriveMotor:
 		encoderTick = self._getEncoderTick()
 		deltaEncoderTick = encoderTick - self.encoderTickOffset
 		degrees = self._encoderTickToDegrees(deltaEncoderTick)
-		return degrees
+		
+		# check to see if angle in bounds (0.0-360.0)
+		boundedAngle = OdriveMotor._boundAngle(degrees)
+		return boundedAngle
 
 	
 	def closePort(self):
@@ -530,6 +567,105 @@ class OdriveMotor:
 		scaledAngularVelocity = self._rpmToCountsPerSec(angVel) # counts/sec, int
 		self.axis.controller.config.vel_limit = scaledAngularVelocity
 		return
+	
+	def _torqueToCurrent(self, torque):
+		""" Converts torque to current
+		
+			Parameters: 
+			torque (float): torque value in Newton-meters
+			
+			Returns:
+			(float): value of current in Amps
+		"""
+		# Using the motor current and the known KV of your motor you can 
+		# estimate the motors torque using the following relationship: 
+		# Torque [N.m] = 8.27 * Current [A] / KV.
+		KV = 100
+		current = (torque * KV / 8.27) / self.gearRatio
+		return current
+		
+		
+		
+		
+	def _currentToTorque(self, current):
+		""" Converts current to torque
+		
+			Parameters:
+			current (float): current value in Amps
+			
+			Returns:
+			(float): value of torque in Newton-meters
+		"""
+		# Using the motor current and the known KV of your motor you can 
+		# estimate the motors torque using the following relationship: 
+		# Torque [N.m] = 8.27 * Current [A] / KV.
+		KV = 100
+		torque = (8.27 * current / KV) * self.gearRatio
+		return torque	
+
+	def _torqueMode(self):
+		"""Method to activate the Profile Torque or torque profile.
+		
+			Parameters:
+			None
+			
+			Returns:
+			None
+		"""
+		self.axis.controller.config.control_mode = CTRL_MODE_CURRENT_CONTROL
+		self.axis.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+		self.controlMode = ControlMode.Torque
+		return
+	
+	def _angularVelocityMode(self):
+		"""Method to activate the angular velocity control
+		
+			Parameters:
+			None
+			
+			Returns:
+			None
+		"""
+		self.axis.controller.config.control_mode = CTRL_MODE_VELOCITY_CONTROL
+		self.axis.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+		self.controlMode = ControlMode.AngularVelocity
+		return
+		
+	def _angularPositionMode(self):
+		"""Method to activate the angular position control
+			
+			Parameters:
+			None
+			
+			Returns:
+			None
+		"""
+		# use closed loop control
+		self.axis.controller.config.control_mode = CTRL_MODE_POSITION_CONTROL
+		self.axis.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+		self.controlMode = ControlMode.AngularPosition
+		return			
+	
+	@staticmethod
+	def _boundAngle(angle):
+		""" Bounds an angle into the range 0.0 - 360.0 degrees
+		
+			Parameters:
+			angle (float): angle to bound, must be in degrees
+			
+			Returns:
+			(float): bounded angle in range 0.0 - 360.0 degrees
+		"""
+		degreesPerRotation = 360.0
+		angPos = angle
+		if angPos >= 360.0:
+			divisor = int(angPos/degreesPerRotation)
+			angPos = angPos - divisor*degreesPerRotation
+		if angPos < 0.0:
+			divisor = int( angPos/degreesPerRotation ) - 1
+			angPos = angPos - divisor*degreesPerRotation
+		return angPos
+		
 	
 	@staticmethod
 	def _sign(value):

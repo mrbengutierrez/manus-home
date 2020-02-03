@@ -1,2 +1,0 @@
-# Put this file in /etc/udev/rules.d and: service udev restart
-KERNEL=="ttyACM[0-9]*", ACTION=="add", ATTRS{idVendor}=="292f", MODE="0666"

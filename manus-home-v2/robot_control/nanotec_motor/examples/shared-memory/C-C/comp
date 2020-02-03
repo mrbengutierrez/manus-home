@@ -1,2 +1,0 @@
-g++ -o shmwriter shmwriter.c
-g++ -o shmreader shmreader.c
