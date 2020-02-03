@@ -4,7 +4,7 @@ This files test the torque of OdriveMotor.py
 
 Author: Benjamin Gutierrez
 email: mrbengutierrez@gmail.com
-date: 02/01/2020
+date: 02/03/2020
 """
 
 
@@ -21,7 +21,7 @@ def testAngularVelocity():
 	"""Tests the torque of the odrive motor"""
 	
 	motorController = OdriveController()
-	#motorController.calibrate()
+	motorController.calibrate()
 	[leftMotor,rightMotor] = motorController.getMotors()
 	
 	highTorque = 0.7
@@ -32,9 +32,6 @@ def testAngularVelocity():
 	
 	print("Testing left motor")
 	
-	print(leftMotor.getTorque())
-	print("Setting Torque Mode")
-	leftMotor.torqueMode()
 	print(leftMotor.getTorque())
 
 	print("Testing setTorque(" + str(highTorque) + ")")
@@ -54,9 +51,6 @@ def testAngularVelocity():
 	
 	print("Testing right motor")
 	
-	print(rightMotor.getTorque())
-	print("Setting Torque Mode")
-	rightMotor.torqueMode()
 	print(rightMotor.getTorque())
 
 	print("Testing setTorque(" + str(highTorque) + ")")

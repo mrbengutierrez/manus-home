@@ -239,7 +239,7 @@ class OdriveMotor:
 	
 
 	
-	def setTorque(self, torque):
+	def setTorque(self, torque, maxAngVel=400):
 		"""Method to activate the Profile Torque or torque profile.
 
 			Parameters:
@@ -247,6 +247,9 @@ class OdriveMotor:
 			Returns:
 			None
 		"""
+		# set the maximum planned angular velocity
+		self._setMaxAngularVelocity(maxAngVel)
+				
 		# make sure we are are in torque control mode
 		if self.controlMode != ControlMode.Torque:
 			self._torqueMode()

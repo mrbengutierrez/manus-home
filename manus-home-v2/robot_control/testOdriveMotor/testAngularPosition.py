@@ -4,7 +4,7 @@ This files test the angular position of OdriveMotor.py
 
 Author: Benjamin Gutierrez
 email: mrbengutierrez@gmail.com
-date: 02/01/2020
+date: 02/03/2020
 """
 
 
