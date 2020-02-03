@@ -250,14 +250,18 @@ class ArmController(Kinematics):
 		super().__init__()
 		
 		# calibrate motors before starting
-		#import os
-		#os.system("sudo ./nanotec_motor/calibrateMotors")
+		
 		
 		#initialize motors
 		motorController = OdriveController()
 		#motorController.calibrate()
 		[self.leftMotor,self.rightMotor] = motorController.getMotors()
 		
+		# calibrate motors before starting
+		leftInitialAngle = 180.0 # degrees
+		self.leftMotor.calibrateAngularPosition(leftInitialAngle)
+		rightInitialAngle = 90.0 # degrees
+		self.rightMotor.calibrateAngularPosition(rightInitialAngle)		
 		
 		
 	def calibratePosition(self):
@@ -291,6 +295,17 @@ class ArmController(Kinematics):
 		while(True):
 			self.printPositionInformation()
 			time.sleep(1)
+
+	def stop(self):
+		"""Method that sends the commands to stops the motors.
+		
+			Returns:
+			None    
+		"""
+		# Disable motor PWM and do nothing
+		self.leftMotor.stop()
+		self.rightMotor.stop()
+		return
 	
 	def getJointAngles(self):
 		"""Returns the joint angles of the robot arm in radians

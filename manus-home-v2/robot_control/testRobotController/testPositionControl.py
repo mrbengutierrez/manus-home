@@ -1,5 +1,13 @@
+"""
+This file tests the setPosition function for the Manus Home V2
+Author: Benjamin Gutierrez
+email: mrbengutierrez@gmail.com
+"""
 
-from CheaperManusController import ArmController
+import sys
+sys.path.append("..")
+
+from RobotController import ArmController
 import time
 import numpy as np
 
@@ -12,11 +20,13 @@ def printRobotInformation(arm):
 
 def testPositionControl():
 	arm = ArmController()
+	arm.stop()
+	time.sleep(5) # delay start
 	while(True):
-		arm.setPosition(np.array([-0.1,0.4]))
+		arm.setPosition(np.array([-0.1,0.25]))
 		printRobotInformation(arm)
 		time.sleep(5)
-		arm.setPosition(np.array([0.1,0.4]))
+		arm.setPosition(np.array([0.1,0.25]))
 		printRobotInformation(arm)
 		time.sleep(5)
 		

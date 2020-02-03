@@ -378,22 +378,22 @@ class OdriveMotor:
 		# case 1: rotate clockwise
 		if deltaPosition > 0.0 and abs(deltaPosition) >= degreesPerRotation/2:
 			relativePosition = -abs(degreesPerRotation - deltaPosition) # clockwise
-			print("case 1") # for debugging
+			#print("case 1") # for debugging
 			
 		# case 2: rotate clockwise
 		elif deltaPosition < 0.0 and abs(deltaPosition) <= degreesPerRotation/2:
 			relativePosition = -abs(deltaPosition) # clockwise
-			print("case 2") # for debugging
+			#print("case 2") # for debugging
 
 		# case 3: rotate counter-clockwise
 		elif deltaPosition < 0.0 and abs(deltaPosition) >= degreesPerRotation/2:
 			relativePosition = abs(degreesPerRotation + deltaPosition) # counter-clockwise
-			print("case 3") # for debugging
+			#print("case 3") # for debugging
 			
 		# case 4: rotate counter-clockwise
 		elif deltaPosition > 0.0 and abs(deltaPosition) <= degreesPerRotation/2:
 			relativePosition = abs(deltaPosition) # counter-clockwise		
-			print("case 4") # for debugging
+			#print("case 4") # for debugging
 			
 		else:
 			raise RuntimeError("position difference did not meet any cases")
