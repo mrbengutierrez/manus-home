@@ -16,7 +16,7 @@ Date: 02/03/2020
 import odrive
 from odrive.enums import *
 
-import enum # for control modes
+import enum # for control modes & errors
 
 class ControlMode(enum.Enum):
 	""" Enumeration for specifying control mode that OdriveMotor is in"""
@@ -24,6 +24,62 @@ class ControlMode(enum.Enum):
 	AngularPosition = 1
 	AngularVelocity = 2
 	Torque = 3
+
+# Lookup dictionary for Motor Errors
+MotorError = {
+	0x0000: "ERROR_NONE",
+	0x0001: "ERROR_PHASE_RESISTANCE_OUT_OF_RANGE",
+	0x0002: "ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE",
+	0x0004: "ERROR_ADC_FAILED",
+	0x0008: "ERROR_DRV_FAULT",
+	0x0010: "ERROR_CONTROL_DEADLINE_MISSED",
+	0x0020: "ERROR_NOT_IMPLEMENTED_MOTOR_TYPE",
+	0x0040: "ERROR_BRAKE_CURRENT_OUT_OF_RANGE",
+	0x0080: "ERROR_MODULATION_MAGNITUDE",
+	0x0100: "ERROR_BRAKE_DEADTIME_VIOLATION",
+	0x0200: "ERROR_UNEXPECTED_TIMER_CALLBACK",
+	0x0400: "ERROR_CURRENT_SENSE_SATURATION",
+	0x0800: "ERROR_INVERTER_OVER_TEMP",
+	0x1000:	"ERROR_CURRENT_UNSTABLE"
+}
+
+# Lookup dictionary for Axis Errors
+AxisError = {
+	0x00: "ERROR_NONE",
+	0x01: "ERROR_INVALID_STATE",
+	0x02: "ERROR_DC_BUS_UNDER_VOLTAGE",
+	0x04: "ERROR_DC_BUS_OVER_VOLTAGE",
+	0x08: "ERROR_CURRENT_MEASUREMENT_TIMEOUT",
+	0x10: "ERROR_BRAKE_RESISTOR_DISARMED",
+	0x20: "ERROR_MOTOR_DISARMED",
+	0x40: "ERROR_MOTOR_FAILED",
+	0x80: "ERROR_SENSORLESS_ESTIMATOR_FAILED",
+	0x100: "ERROR_ENCODER_FAILED",
+	0x200: "ERROR_CONTROLLER_FAILED",
+	0x400: "ERROR_POS_CTRL_DURING_SENSORLESS",
+	0x800: "ERROR_WATCHDOG_TIMER_EXPIRED"
+}
+
+# Lookup dictionary for Encoder Errors
+EncoderError = {
+	0: "ERROR_NONE",
+	0x01: "ERROR_UNSTABLE_GAIN",
+	0x02: "ERROR_CPR_OUT_OF_RANGE",
+	0x04: "ERROR_NO_RESPONSE",
+	0x08: "ERROR_UNSUPPORTED_ENCODER_MODE",
+	0x10: "ERROR_ILLEGAL_HALL_STATE",
+	0x20: "ERROR_INDEX_NOT_FOUND_YET"
+}
+
+# Lookup dictionary for Controller Errors
+ControllerError = {
+	0: "ERROR_NONE",
+	0x01: "ERROR_OVERSPEED"
+}
+
+
+ 
+ 
 
 
 # gear ratio of the actuation module
@@ -57,7 +113,7 @@ class OdriveController:
 			# Find an ODrive that is connected on the serial port /dev/ttyUSB0
 			#self.my_drive = odrive.find_any("serial:/dev/ttyUSB0")
 			self.my_drive = odrive.find_any("serial:" + serialPort)
-			
+		
 
 		# Set brake resistor value
 		self.my_drive.config.brake_resistance = 2 # Ohm
@@ -69,9 +125,23 @@ class OdriveController:
 			self.motors = [self.my_drive.axis0,self.my_drive.axis1]
 		
 		for axis in self.motors:
+			
+			#check for errors, and clear them so motor can start
+			print("Error values for axis:")
+			print("    axis: " + str(AxisError[axis.error]))
+			print("    motor: " + str(MotorError[axis.motor.error]))
+			print("    encoder: " + str(EncoderError[axis.encoder.error]))
+			print("    controller: " + str(ControllerError[axis.controller.error]))
+			axis.error = 0
+			axis.motor.error = 0
+			axis.encoder.error = 0
+			axis.controller.error = 0
+			
+			
+
 
 			# Set current limit
-			axis.motor.config.current_lim = 40 # Amps
+			axis.motor.config.current_lim = 20 # Amps
 			
 			# Set velocity limit
 			#self.my_drive.axis0.motor.config.vel_limit = 100 # counts/s
@@ -267,6 +337,10 @@ class OdriveMotor:
 			Returns
 			None
 		"""
+		# set the maximum planned angular velocity
+		tolerance = 2
+		self._setMaxAngularVelocity(tolerance*maxAngVel)		
+
 		# make sure we are in angular velocity control mode
 		if self.controlMode != ControlMode.AngularVelocity:
 			self._angularVelocityMode()
@@ -368,7 +442,7 @@ class OdriveMotor:
 		
 		# bound angular position in range 0.0 - 360.0 degrees
 		angPos = OdriveMotor._boundAngle(angPos)
-		print("angPos given: " + str(angPos)) # for debugging
+		#print("angPos given: " + str(angPos)) # for debugging
 			
 		# set angular position
 		currentPosition = self.getAbsoluteAngularPosition()

@@ -253,9 +253,9 @@ class ArmController(Kinematics):
 		
 		
 		#initialize motors
-		motorController = OdriveController()
+		self.motorController = OdriveController()
 		#motorController.calibrate()
-		[self.leftMotor,self.rightMotor] = motorController.getMotors()
+		[self.leftMotor,self.rightMotor] = self.motorController.getMotors()
 		
 		# calibrate motors before starting
 		leftInitialAngle = 180.0 # degrees
@@ -264,18 +264,38 @@ class ArmController(Kinematics):
 		self.rightMotor.calibrateAngularPosition(rightInitialAngle)		
 		
 		
-	def calibratePosition(self):
+	def calibratePosition(self, angles=[180.0, 90.0], delayTime=5, calibrateMotors=False):
 		"""Use to calibrate that absolute angular position of the nanotec-motor with the robot arm
 			
 			Mount the robot arm in the configuration specified by the prompt given.
+			
+			Parameters:
+			angles (list of floats):
+				angles[0]: left joint angle in degrees
+				angles[1]: right joint angle in degrees
+			delayTime (int): time in seconds to give user to calibrate motors
+			calibrateMotors (bool): if True calibrate motors, else skip this calibration
+			Returns:
+			None
 		"""
-		self.rightMotor.setAbsoluteAngularPositionShortestPath(90.0)
-		self.leftMotor.setAbsoluteAngularPositionShortestPath(180.0)
-		time.sleep(1)
-		self.printPositionInformation()
-		time.sleep(5)
-		self.rightMotor.stop()
-		self.leftMotor.stop()
+		leftAngle = angles[0]
+		rightAngle = angles[1]
+		
+		self.stop()
+		print("You have " + str(delayTime) + " seconds to completed the following:")
+		print("Place left motor angle at " + str(leftAngle) + " degrees")
+		print("Place right motor angle at " + str(rightAngle) + " degrees")
+		time.sleep(delayTime)
+		
+		print("Calibrating...")
+		if calibrateMotors == True:
+			self.motorController.calibrate()
+			[self.leftMotor,self.rightMotor] = self.motorController.getMotors()
+			
+		self.leftMotor.calibrateAngularPosition(leftAngle)
+		self.rightMotor.calibrateAngularPosition(rightAngle)
+		print("Motors calibrated")
+		return
 		
 	def printPositionInformation(self):
 		"""Prints the position information for the robot"""
@@ -339,7 +359,7 @@ class ArmController(Kinematics):
 		position = self.forwardKinematics(q)
 		return position
 		
-	def setPosition(self,r,speed=3):
+	def setPosition(self,r,speed=30):
 		"""moves robot arm to a particular position
 		
 		Parameters:
@@ -398,9 +418,8 @@ class ArmController(Kinematics):
 		angularVelocityScaled = angularVelocityRPM * self.gearRatio # account for gear ratio
 		
 		# set motor angular velocity in rpms using ints
-		
 		self.leftMotor.setAngularVelocity(int( angularVelocityScaled[0] )) 
-		self.leftMotor.setAngularVelocity(int( angularVelocityScaled[1] ))   
+		self.rightMotor.setAngularVelocity(int( angularVelocityScaled[1] ))   
 		
 	
 	def getForce(self):
@@ -453,8 +472,9 @@ class ArmController(Kinematics):
 		leftTorque = int(round(torque[0],-2))
 		rightTorque = int(round(torque[1],-2))
 		#print("torque: " + str([leftTorque,rightTorque]))
-		self.leftMotor.setTorque(leftTorque)
-		self.rightMotor.setTorque(rightTorque)
+		maxAngVel = 30 # rpm, make sure motor does not spin too fast
+		self.leftMotor.setTorque(leftTorque, maxAngVel)
+		self.rightMotor.setTorque(rightTorque, maxAngVel)
 	
 	def setImpedance(self,impedanceMatrix,referencePosition,referenceVelocity=0):
 		"""

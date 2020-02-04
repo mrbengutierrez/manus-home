@@ -23,13 +23,16 @@ def testPositionControl():
 	arm.stop()
 	time.sleep(5) # delay start
 	while(True):
-		arm.setPosition(np.array([-0.1,0.25]))
-		printRobotInformation(arm)
-		time.sleep(5)
-		arm.setPosition(np.array([0.1,0.25]))
-		printRobotInformation(arm)
-		time.sleep(5)
-		
+		try:
+			arm.setPosition(np.array([-0.1,0.35]))
+			printRobotInformation(arm)
+			time.sleep(5)
+			arm.setPosition(np.array([0.1,0.35]))
+			printRobotInformation(arm)
+			time.sleep(5)
+		except KeyboardInterrupt:
+			arm.stop()
+			raise KeyboardInterrupt
 		
 
 def main():
