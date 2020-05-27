@@ -2,9 +2,9 @@
 
 ### Contributors
 * Benjamin Gutierrez (mrbengutierrez@gmail.com)
-  * Starting to figure out how to control multiple motors
+  * How to control multiple motors
   * Worked on python & c++ position, velocity, and torque set & get functions
-* Moises Alencastre-Miranda (alencastre@gmail.com)
+* Moises Alencastre-Miranda, PhD (alencastre@gmail.com)
   * Developed a torque control user interface
   * Developed program to read relative angle in degrees
 
