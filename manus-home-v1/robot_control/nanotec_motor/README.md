@@ -8,7 +8,7 @@
 * Moises Alencastre-Miranda, PhD (alencastre@gmail.com)
   * Developed a torque control user interface
   * Developed program to read relative angle in degrees
-  * Specific files: CommunicationNT
+  * Specific files: CommunicationNT, torque function of Nanotec Motor
 
 
 ### About
